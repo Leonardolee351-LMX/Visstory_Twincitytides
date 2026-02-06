@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>边界在生长，但通勤与城市仍未对齐</title>
+    
+    <!-- Unified Fonts matching 3.x series -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0E7490', // Cyan 700
+                        secondary: '#06B6D4', // Cyan 500
+                        slate: { 
+                            850: '#1e293b',
+                            900: '#0f172a' 
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans SC', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    boxShadow: {
+                        'glass': '0 10px 30px -10px rgba(14, 116, 144, 0.1)',
+                        'glass-hover': '0 20px 40px -10px rgba(14, 116, 144, 0.2)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary: #0E7490;
+            --secondary: #06B6D4;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body { 
+            background-color: #f8fafc; 
+            color: var(--text-main);
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* --- Glassmorphism Cards (Matches 3-1 & 3-3) --- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 20px 40px -4px rgba(14, 116, 144, 0.1);
+            border-color: var(--secondary);
+        }
+
+        /* --- Section Styling --- */
+        .section-number {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        /* --- Bento Grid Layout Preserved --- */
+        .bento-board {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            padding: 2rem 0 4rem 0;
+        }
+
+        .bento-tile {
+            /* Inherits glass-card styles via class in HTML */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-radius: 24px; /* Soft rounding like 3.x */
+            padding: 1.75rem;
+        }
+
+        .bento-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+        
+        .bento-title i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .bento-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-top: 1rem;
+        }
+
+        .bento-metric {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .bento-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 2.25rem;
+            color: var(--primary);
+            line-height: 1;
+            letter-spacing: -0.05em;
+        }
+
+        .bento-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.5rem;
+        }
+
+        /* --- Narrative Section --- */
+        .narrative-section {
+            padding: 6rem 0;
+            border-top: 1px dashed #cbd5e1;
+        }
+
+        /* --- Next Page Button --- */
+        .next-page-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2.5rem;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px -5px rgba(14, 116, 144, 0.3);
+        }
+
+        .next-page-btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -5px rgba(14, 116, 144, 0.4);
+        }
+
+        /* Animation */
+        body { animation: fadeInPage 0.8s ease-out; }
+        @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .bento-board { display: flex; flex-direction: column; }
+            .narrative-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="p-6 md:p-12 lg:p-20">
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-2xl">
+        <div class="bg-white/70 backdrop-blur-md border border-slate-200/50 shadow-lg rounded-2xl px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+                <span class="text-xs font-bold tracking-widest text-slate-800 uppercase font-mono">NBSB Research</span>
+            </div>
+            <div class="flex gap-4 md:gap-8">
+                <a href="3-1.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-1"><span data-zh="跨时空分析" data-en="Cross-Temporal Analysis">跨时空分析</span></a>
+                <a href="3-2.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-2"><span data-zh="群像纪实" data-en="Persona">Persona</span></a>
+                <a href="3-3.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-timeline"><span data-zh="跨境时间线" data-en="Cross-Border Timeline">跨境时间线</span></a>
+                <a href="4-1future_question.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-future"><span data-zh="未来议题" data-en="Future Questions">未来议题</span></a>
+            </div>
+            <button id="lang-toggle" class="text-xs font-semibold px-3 py-1 rounded-lg border border-slate-200 text-slate-600 hover:text-primary">EN</button>
+            <button onclick="window.print()" class="hidden md:block text-slate-400 hover:text-slate-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            </button>
+        </div>
+    </nav>
+
+    <style>
+        .nav-link { color: #64748b; position: relative; }
+        .nav-link.active { color: #0E7490; }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #0E7490;
+            border-radius: 2px;
+        }
+    </style>
+
+    <script>
+        const currentFile = window.location.pathname.split("/").pop();
+        if (currentFile === "3-1.html" || currentFile === "") {
+            document.getElementById('nav-3-1').classList.add('active');
+        } else if (currentFile === "3-2.html") {
+            document.getElementById('nav-3-2').classList.add('active');
+        } else if (currentFile === "3-3.html" || currentFile === "timeline%20copy.html") {
+            document.getElementById('nav-timeline').classList.add('active');
+        } else if (currentFile === "4-1future_question.html") {
+            document.getElementById('nav-future').classList.add('active');
+        }
+        let lang = localStorage.getItem('lang') || 'en';
+        function applyLang(l) {
+            document.querySelectorAll('[data-zh]').forEach(el => {
+                const txt = el.getAttribute(l === 'zh' ? 'data-zh' : 'data-en');
+                if (txt) el.textContent = txt;
+            });
+            document.documentElement.lang = l === 'zh' ? 'zh-CN' : 'en';
+            const btn = document.getElementById('lang-toggle');
+            if (btn) btn.textContent = l === 'zh' ? 'EN' : '中文';
+        }
+        applyLang(lang);
+        const toggle = document.getElementById('lang-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                lang = lang === 'zh' ? 'en' : 'zh';
+                localStorage.setItem('lang', lang);
+                applyLang(lang);
+            });
+        }
+    </script>
+
+    <div class="max-w-7xl mx-auto space-y-16 mt-20">
+        
+        <!-- Header -->
+        <header class="space-y-6 max-w-4xl mx-auto text-center">
+            <div class="flex items-center justify-center gap-4">
+                <span class="h-[1px] w-12 bg-slate-300"></span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-bold tracking-widest uppercase font-mono border border-slate-200">Critical Analysis</span>
+                <span class="h-[1px] w-12 bg-slate-300"></span>
+            </div>
+            
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-850 leading-tight">
+                <span data-zh="边界在生长，" data-en="Borders Grow,">边界在生长，</span>
+                <span class="text-primary block mt-2" data-zh="但通勤与城市仍未对齐" data-en="Commute and City Still Misaligned">但通勤与城市仍未对齐</span>
+            </h1>
+            
+            <p class="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl mx-auto">
+                <span data-zh="深港之间不缺“跨越”，缺的是“停留”：口岸附近的承接、过关后的接驳，以及跨境生活被吞噬的时间。" data-en="Crossing is easy; staying is hard: poor catchment, weak links, lost time.">深港之间不缺“跨越”，缺的是“停留”：口岸附近的承接、过关后的接驳，以及跨境生活被吞噬的时间。</span>
+            </p>
+            <p class="font-bold text-secondary text-sm md:text-base">
+                <span data-zh="当边界仍像通道而非目的地，“跨境”就会变成每天重复的时间成本。" data-en="When borders stay corridors, crossing becomes daily time cost.">当边界仍像通道而非目的地，“跨境”就会变成每天重复的时间成本。</span>
+            </p>
+        </header>
+
+        <!-- Bento Board -->
+        <div class="bento-board">
+            <div class="bento-tile glass-card" style="grid-column: span 4;">
+                <div class="bento-title"><i class="ph-buildings"></i><span data-zh="承接不足" data-en="Weak catchment">Weak catchment</span></div>
+                <div class="bento-desc"><span data-zh="口岸附近缺少足够的职住与服务配套，难把“流量”变成“留量”。" data-en="Port areas lack jobs, housing, and services; ‘flow’ rarely becomes ‘stay’.">Port areas lack jobs, housing, and services; ‘flow’ rarely becomes ‘stay’.</span></div>
+                <div class="bento-metric"><div class="bento-value">-45%</div><div class="bento-label"><span data-zh="职住平衡指数 (对比市中心)" data-en="Job–home balance (vs. CBD)">Job–home balance (vs. CBD)</span></div></div>
+            </div>
+            <div class="bento-tile glass-card" style="grid-column: span 4;">
+                <div class="bento-title"><i class="ph-link-break"></i><span data-zh="功能断裂" data-en="Functional gaps">Functional gaps</span></div>
+                <div class="bento-desc"><span data-zh="跨境节点与生活目的地之间隔着大片“低效空间”。" data-en="Large low‑efficiency spaces separate nodes from destinations.">Large low‑efficiency spaces separate nodes from destinations.</span></div>
+                <div class="bento-metric"><div class="bento-value">&gt;5km</div><div class="bento-label"><span data-zh="平均接驳距离" data-en="Avg. transfer distance">Avg. transfer distance</span></div></div>
+            </div>
+            <div class="bento-tile glass-card" style="grid-column: span 4;">
+                <div class="bento-title"><i class="ph-thermometer-cold"></i><span data-zh="冷热不均" data-en="Uneven heat">Uneven heat</span></div>
+                <div class="bento-desc"><span data-zh="一侧高密吸附，另一侧难以转化人流，形成结构性差距。" data-en="One side absorbs; the other can’t convert—structural gap.">One side absorbs; the other can’t convert—structural gap.</span></div>
+                <div class="bento-metric"><div class="bento-value">10:1</div><div class="bento-label"><span data-zh="深港口岸周边商业密度比" data-en="Border‑adjacent commercial density (SZ:HK)">Border‑adjacent commercial density (SZ:HK)</span></div></div>
+            </div>
+            <div class="bento-tile glass-card" style="grid-column: span 3;">
+                <div class="bento-title"><i class="ph-timer"></i><span data-zh="全链路拉长" data-en="Chain lengthening">Chain lengthening</span></div>
+                <div class="bento-desc"><span data-zh="快的是“过境”，慢的是“到门”。" data-en="Crossing is fast; reaching the door is slow.">Crossing is fast; reaching the door is slow.</span></div>
+                <div class="bento-metric"><div class="bento-value">70%</div><div class="bento-label"><span data-zh="通勤时间消耗在接驳交通" data-en="Commute time spent on transfers">Commute time spent on transfers</span></div></div>
+            </div>
+            <div class="bento-tile glass-card" style="grid-column: span 3;">
+                <div class="bento-title"><i class="ph-chart-line-up"></i><span data-zh="峰值放大" data-en="Peak amplification">Peak amplification</span></div>
+                <div class="bento-desc"><span data-zh="客流集中让口岸外的接驳系统成为瓶颈。" data-en="Concentrated flows bottleneck post‑border transfers.">Concentrated flows bottleneck post‑border transfers.</span></div>
+                <div class="bento-metric"><div class="bento-value">+120%</div><div class="bento-label"><span data-zh="高峰期等候时间增幅" data-en="Peak waiting time increase">Peak waiting time increase</span></div></div>
+            </div>
+            <div class="bento-tile glass-card" style="grid-column: span 3;">
+                <div class="bento-title"><i class="ph-question"></i><span data-zh="不确定性" data-en="Uncertainty">Uncertainty</span></div>
+                <div class="bento-desc"><span data-zh="通勤不可预期，才是持续性的心理负担。" data-en="Unpredictability is the lasting burden of commuting.">Unpredictability is the lasting burden of commuting.</span></div>
+                <div class="bento-metric"><div class="bento-value">±30min</div><div class="bento-label"><span data-zh="单程通勤时间浮动范围" data-en="One‑way commute time variance">One‑way commute time variance</span></div></div>
+            </div>
+            <div class="bento-tile glass-card" style="grid-column: span 3;">
+                <div class="bento-title"><i class="ph-hourglass-low"></i><span data-zh="时间贫困" data-en="Time poverty">Time poverty</span></div>
+                <div class="bento-desc"><span data-zh="生活时间被压缩，社区参与难以持续。" data-en="Compressed life time undermines sustained community participation.">Compressed life time undermines sustained community participation.</span></div>
+                <div class="bento-metric"><div class="bento-value">&lt;3h</div><div class="bento-label"><span data-zh="每日可支配自由时间" data-en="Daily discretionary time">Daily discretionary time</span></div></div>
+            </div>
+            <div class="bento-tile glass-card" style="grid-column: span 3;">
+                <div class="bento-title"><i class="ph-wifi-slash"></i><span data-zh="弱连接" data-en="Weak ties">Weak ties</span></div>
+                <div class="bento-desc"><span data-zh="有往来，但缺少沉淀与归属。" data-en="Circulation without anchoring or belonging.">Circulation without anchoring or belonging.</span></div>
+                <div class="bento-metric"><div class="bento-value">-60%</div><div class="bento-label"><span data-zh="本地社区活动参与率" data-en="Local community participation">Local community participation</span></div></div>
+            </div>
+            <div class="bento-tile glass-card bg-primary text-white" style="grid-column: span 9; background: #0E7490; color: white;">
+                <div class="bento-title" style="color: white;"><i class="ph-lightbulb" style="color: #67e8f9;"></i><span data-zh="结论" data-en="Conclusion">Conclusion</span></div>
+                <div class="bento-desc" style="color: #cffafe; font-size: 1.1rem;"><span data-zh="当边界仍像通道而非目的地，跨境生活会被每日的链路消耗切碎，难以沉淀为“同城”。" data-en="When borders remain corridors rather than destinations, cross‑border life is fragmented by daily chain consumption and resists ‘one‑city’ integration.">When borders remain corridors rather than destinations, cross‑border life is fragmented by daily chain consumption and resists ‘one‑city’ integration.</span></div>
+            </div>
+        </div>
+
+        <section id="section1" class="narrative-section grid md:grid-cols-[1fr_2fr] gap-12">
+            <div class="sticky top-24 h-fit">
+                <span class="section-number text-5xl opacity-30">01</span>
+                <h2 class="text-3xl font-bold mt-4 leading-tight text-slate-850"><span data-zh="结构性问题：" data-en="Structural issues:">结构性问题：</span><br><span class="text-secondary" data-zh="两侧发展不对称，让口岸更像“过境通道”" data-en="Asymmetric growth makes ports mere corridors">两侧发展不对称，让口岸更像“过境通道”</span></h2>
+            </div>
+            <div class="space-y-6">
+                <p class="text-slate-600 text-lg leading-relaxed">深圳口岸周边往往承接了高强度的产业与商业，而香港边境带在相当长时间里更像“缓冲地带”。这种密度差异导致人流被迫向更远的市区移动，口岸经济呈现“路过型繁荣”。</p>
+                <div class="grid gap-4">
+                    <div class="glass-card p-6 rounded-2xl flex justify-between items-center group cursor-pointer" data-point="承接不足">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <i class="ph-buildings text-xl text-primary"></i>
+                                <h3 class="font-bold text-slate-800"><span data-zh="承接不足" data-en="Weak catchment">承接不足</span></h3>
+                            </div>
+                            <p class="text-sm text-slate-500"><span data-zh="口岸附近缺少足够的职住与服务配套。" data-en="Port areas lack jobs, housing, services.">口岸附近缺少足够的职住与服务配套。</span></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="block text-2xl font-bold font-mono text-primary group-hover:scale-110 transition-transform">-45%</span>
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Job/Home</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl flex justify-between items-center group cursor-pointer" data-point="功能断裂">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <i class="ph-link-break text-xl text-primary"></i>
+                                <h3 class="font-bold text-slate-800"><span data-zh="功能断裂" data-en="Functional gaps">功能断裂</span></h3>
+                            </div>
+                            <p class="text-sm text-slate-500"><span data-zh="跨境节点与生活目的地之间隔着大片“低效空间”。" data-en="Large low-efficiency spaces separate nodes.">跨境节点与生活目的地之间隔着大片“低效空间”。</span></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="block text-2xl font-bold font-mono text-primary group-hover:scale-110 transition-transform">&gt;5km</span>
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Distance</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section2" class="narrative-section grid md:grid-cols-[1fr_2fr] gap-12">
+            <div class="sticky top-24 h-fit">
+                <span class="section-number text-5xl opacity-30">02</span>
+                <h2 class="text-3xl font-bold mt-4 leading-tight text-slate-850"><span data-zh="链路性问题：" data-en="Chain issues:">链路性问题：</span><br><span class="text-secondary" data-zh="通勤痛不在“过关”，在“过关之后”" data-en="Pain isn’t crossing; it’s after crossing">通勤痛不在“过关”，在“过关之后”</span></h2>
+            </div>
+            <div class="space-y-6">
+                <p class="text-slate-600 text-lg leading-relaxed">通关速度提升，解决的是“穿越边界”的效率；但跨境通勤的真实体验由全链路决定。时间黑洞往往在“最后一公里”的换乘、排队与不确定性中。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="glass-card p-6 rounded-2xl text-center group" data-point="全链路拉长">
+                        <i class="ph-timer text-3xl text-secondary mb-3"></i>
+                        <h3 class="font-bold text-slate-800 mb-2">全链路拉长</h3>
+                        <p class="text-xs text-slate-500 mb-4">快的是“过境”，慢的是“到门”。</p>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                             <span class="block text-3xl font-mono font-bold text-primary">70%</span>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Time spent on transfers</span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl text-center group" data-point="峰值放大">
+                        <i class="ph-chart-line-up text-3xl text-secondary mb-3"></i>
+                        <h3 class="font-bold text-slate-800 mb-2">峰值放大</h3>
+                        <p class="text-xs text-slate-500 mb-4">客流集中让口岸外的接驳系统成为瓶颈。</p>
+                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <span class="block text-3xl font-mono font-bold text-primary">+120%</span>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Peak wait time</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section3" class="narrative-section grid md:grid-cols-[1fr_2fr] gap-12">
+            <div class="sticky top-24 h-fit">
+                <span class="section-number text-5xl opacity-30">03</span>
+                <h2 class="text-3xl font-bold mt-4 leading-tight text-slate-850">生活性后果：<br><span class="text-secondary">“时间贫困”限制融合深度</span></h2>
+            </div>
+            <div class="space-y-6">
+                <p class="text-slate-600 text-lg leading-relaxed">当每天的通勤把时间切碎，跨境生活更像“赶路”而非“同城”。时间被吞噬，直接减少了社区参与、文化活动与稳定社交的机会，最终形成一种弱连接状态。</p>
+                <div class="glass-card p-8 rounded-3xl border-l-4 border-primary">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-cyan-50 rounded-full text-primary">
+                            <i class="ph-hourglass-low text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">时间贫困 (Time Poverty)</h3>
+                            <p class="text-slate-600 mb-6">生活时间被压缩，社区参与难以持续。</p>
+                            <div class="flex gap-8">
+                                <div>
+                                    <span class="block text-4xl font-mono font-bold text-slate-850">&lt;3h</span>
+                                    <span class="text-xs text-slate-400 uppercase tracking-wide">Free Time/Day</span>
+                                </div>
+                                <div>
+                                    <span class="block text-4xl font-mono font-bold text-slate-850">-60%</span>
+                                    <span class="text-xs text-slate-400 uppercase tracking-wide">Social Part.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="conclusion text-center py-20 border-t border-slate-200">
+            <p class="text-xl md:text-2xl text-slate-600 font-serif italic leading-relaxed max-w-3xl mx-auto mb-12">
+                "结构性不均衡制造了刚性跨境需求，链路性低效放大了时间成本，而时间贫困又反过来压缩跨境生活的深度——于是边界可以更快被跨越，但城市仍难真正‘同城’。"
+            </p>
+            <a href="commuter_profiles(1).html" class="next-page-btn">
+                <span>返回通勤者故事</span>
+                <i class="ph-arrow-right"></i>
+            </a>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.bento-tile, .glass-card');
+
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    const dataPoint = card.getAttribute('data-point');
+                    if(dataPoint) console.log(`Highlight: ${dataPoint}`);
+                });
+            });
+
+            // Intersection Observer for fade-in
+            const sections = document.querySelectorAll('.narrative-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                section.style.transition = 'opacity 0.8s cubic-bezier(0.2, 1, 0.3, 1), transform 0.8s cubic-bezier(0.2, 1, 0.3, 1)';
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>

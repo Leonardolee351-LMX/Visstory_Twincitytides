@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBSB 跨时空分析: 2017 - 2024</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0E7490', 
+                        secondary: '#06B6D4',
+                        slate: { 850: '#1e293b' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        
+        .bento-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        .bento-card:hover {
+            transform: translateY(-4px);
+            background: #ffffff;
+            box-shadow: 0 20px 40px -4px rgba(14, 116, 144, 0.08);
+            border-color: #06B6D4;
+        }
+
+        .data-bar-fill { animation: fillBar 1.5s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+        @keyframes fillBar { from { width: 0; } to { width: var(--target); } }
+
+        .section-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+        }
+
+        .quote-box {
+            border-left: 3px solid #06B6D4;
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        body {
+            animation: fadeInPage 0.8s ease-out;
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+    </style>
+</head>
+<body class="p-6 md:p-12 lg:p-20">
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-2xl">
+    <div class="bg-white/70 backdrop-blur-md border border-slate-200/50 shadow-lg rounded-2xl px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+            <span class="text-xs font-bold tracking-widest text-slate-800 uppercase font-mono">NBSB Research</span>
+        </div>
+        
+        <div class="flex gap-4 md:gap-8">
+            <a href="3-1.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-1"><span data-zh="跨时空分析" data-en="Cross-Temporal Analysis">跨时空分析</span></a>
+            <a href="3-2.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-2"><span data-zh="群像纪实" data-en="Persona">Persona</span></a>
+            <a href="3-3.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-timeline"><span data-zh="跨境时间线" data-en="Cross-Border Timeline">跨境时间线</span></a>
+            <a href="4-1future_question.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-future"><span data-zh="未来议题" data-en="Future Questions">未来议题</span></a>
+        </div>
+        <button id="lang-toggle" class="text-xs font-semibold px-3 py-1 rounded-lg border border-slate-200 text-slate-600 hover:text-primary">EN</button>
+
+        <button onclick="window.print()" class="hidden md:block text-slate-400 hover:text-slate-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        </button>
+    </div>
+    </nav>
+
+    <style>
+        /* 导航栏状态样式 */
+        .nav-link { color: #64748b; position: relative; }
+        .nav-link.active { color: #0E7490; }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #0E7490;
+            border-radius: 2px;
+        }
+    </style>
+
+    <script>
+        const currentFile = window.location.pathname.split("/").pop();
+        if (currentFile === "3-1.html" || currentFile === "") {
+            document.getElementById('nav-3-1').classList.add('active');
+        } else if (currentFile === "3-2.html") {
+            document.getElementById('nav-3-2').classList.add('active');
+        } else if (currentFile === "3-3.html" || currentFile === "timeline%20copy.html") {
+            document.getElementById('nav-timeline').classList.add('active');
+        } else if (currentFile === "4-1future_question.html") {
+            document.getElementById('nav-future').classList.add('active');
+        }
+        let lang = localStorage.getItem('lang') || 'en';
+        function applyLang(l) {
+            document.querySelectorAll('[data-zh]').forEach(el => {
+                const txt = el.getAttribute(l === 'zh' ? 'data-zh' : 'data-en');
+                if (txt) el.textContent = txt;
+            });
+            document.documentElement.lang = l === 'zh' ? 'zh-CN' : 'en';
+            const btn = document.getElementById('lang-toggle');
+            if (btn) btn.textContent = l === 'zh' ? 'EN' : '中文';
+        }
+        applyLang(lang);
+        const toggle = document.getElementById('lang-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                lang = lang === 'zh' ? 'en' : 'zh';
+                localStorage.setItem('lang', lang);
+                applyLang(lang);
+            });
+        }
+    </script>
+        
+    <div class="max-w-7xl mx-auto space-y-16">
+        
+        <header class="space-y-6 max-w-4xl">
+            <div class="flex items-center gap-4">
+                <span class="px-3 py-1 bg-slate-850 text-white section-tag">Comparative Study</span>
+                <span class="h-[1px] flex-grow bg-slate-200"></span>
+            </div>
+            <h1 class="text-5xl font-extrabold tracking-tight text-slate-850 leading-tight">
+                <span data-zh="从“统计数字”到“生活流”" data-en="From 'Statistics' to 'Life Flow'">从“统计数字”到“生活流”</span><br>
+                <span class="text-primary font-light" data-zh="NBSB 跨境行为变迁研究" data-en="NBSB Cross-Border Behavior Study">NBSB 跨境行为变迁研究</span>
+            </h1>
+        </header>
+
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-12">
+                <h2 class="section-tag text-slate-400 mb-6 underline decoration-primary underline-offset-8 decoration-2">
+                    <span data-zh="量化档案：2017" data-en="Quantitative Archive: 2017">Quantitative Archive: 2017</span>
+                </h2>
+            </div>
+            
+            <div class="lg:col-span-7 bento-card p-10 shadow-sm">
+                <div class="flex justify-between mb-12">
+                    <h3 class="text-xl font-bold"><span data-zh="跨境目的分布分析" data-en="Cross-Border Purpose Distribution">Cross-Border Purpose Distribution</span></h3>
+                    <span class="font-mono text-primary font-bold">
+                        <span data-zh="参考：第三章" data-en="Ref: Chapter 3">Ref: Chapter 3</span>
+                    </span>
+                </div>
+                
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex justify-between mb-2 text-sm font-semibold text-slate-600">
+                            <span>购物 & 娱乐 (Shopping/Leisure)</span>
+                            <span class="font-mono text-primary text-lg">54%</span>
+                        </div>
+                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-primary data-bar-fill" style="--target: 54%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2 text-sm font-semibold text-slate-600">
+                            <span>探亲访友 (Visit Friends/Family)</span>
+                            <span class="font-mono text-secondary text-lg">22%</span>
+                        </div>
+                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-secondary data-bar-fill" style="--target: 22%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2 text-sm font-semibold text-slate-600">
+                            <span>商业/工作 (Business/Work)</span>
+                            <span class="font-mono text-slate-400 text-lg">15%</span>
+                        </div>
+                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-slate-400 data-bar-fill" style="--target: 15%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-slate-500 text-sm leading-relaxed border-t border-slate-50 pt-8">
+                    <span data-zh="2017年的跨境行为显示出强烈的单向性特征。罗湖与落马洲依然是绝对核心，支撑起庞大的‘南下购物’潮。" data-en="2017 crossings were strongly one-way. Luohu and Lok Ma Chau dominated the southbound shopping wave.">2017 crossings were strongly one-way. Luohu and Lok Ma Chau dominated the southbound shopping wave.</span>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 grid grid-cols-2 gap-4">
+                <div class="bento-card p-6 flex flex-col justify-between hover:bg-slate-850 group transition-all">
+                    <span class="font-mono text-xs text-slate-300 group-hover:text-secondary">01</span>
+                    <h4 class="font-bold text-slate-700 group-hover:text-white"><span data-zh="深港通勤族" data-en="SZ–HK Commuters">深港通勤族</span></h4>
+                </div>
+                <div class="bento-card p-6 flex flex-col justify-between hover:bg-slate-850 group transition-all">
+                    <span class="font-mono text-xs text-slate-300 group-hover:text-secondary">02</span>
+                    <h4 class="font-bold text-slate-700 group-hover:text-white"><span data-zh="周末特种兵" data-en="Weekend Raiders">周末特种兵</span></h4>
+                </div>
+                <div class="bento-card p-6 flex flex-col justify-between hover:bg-slate-850 group transition-all">
+                    <span class="font-mono text-xs text-slate-300 group-hover:text-secondary">03</span>
+                    <h4 class="font-bold text-slate-700 group-hover:text-white"><span data-zh="北上安老长者" data-en="Elderly Moving North">北上安老长者</span></h4>
+                </div>
+                <div class="bento-card p-6 flex flex-col justify-between hover:bg-slate-850 group transition-all">
+                    <span class="font-mono text-xs text-slate-300 group-hover:text-secondary">04</span>
+                    <h4 class="font-bold text-slate-700 group-hover:text-white"><span data-zh="留学硕博通勤者" data-en="Postgrad Commuters">留学硕博通勤者</span></h4>
+                </div>
+                <div class="col-span-2 bento-card p-6 bg-primary text-white">
+                    <div class="section-tag opacity-70 mb-2">
+                        <span data-zh="每周频率" data-en="Weekly Frequency">Weekly Frequency</span>
+                    </div>
+                    <div class="text-4xl font-mono font-bold">2.8 <span class="text-sm font-light">avg.</span></div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="border-slate-200">
+
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div class="lg:col-span-4 space-y-6">
+                <div class="section-tag text-primary">Qualitative Analysis</div>
+                <div class="font-mono text-3xl font-bold tracking-tight text-slate-850">2024_FIELD_OBSERVATION</div>
+                <h3 class="text-2xl font-bold text-slate-850"><span data-zh="2024：疫情后的跨境生活观察" data-en="2024: Post‑pandemic Cross‑border Living Observation">2024: Post‑pandemic Cross‑border Living Observation</span></h3>
+                <p class="text-slate-500 leading-relaxed text-sm">
+                    <span data-zh="疫情后的管制站与双城差异刺激更多人参与进港深的跨境生活。尽管2024年与边界和通勤相关的人口统计学数据尚未公布，但通过在港人在社交媒体上鲜活的生活流中，我们仍然可以清晰观察与感受到边界融合的剧烈演变，和不同人群对生活的反思和决策演变" data-en="Post‑pandemic border controls and dual‑city contrasts are drawing more people into cross‑border living between Hong Kong and Shenzhen. Although 2024 statistics on borders and commuting have not yet been released, the vivid everyday streams shared by Hong Kong residents on social media clearly reveal a rapid convergence at the border, along with different groups’ reflections and evolving life decisions.">Post‑pandemic border controls and dual‑city contrasts are drawing more people into cross‑border living between Hong Kong and Shenzhen. Although 2024 statistics on borders and commuting have not yet been released, the vivid everyday streams shared by Hong Kong residents on social media clearly reveal a rapid convergence at the border, along with different groups’ reflections and evolving life decisions.</span>
+                </p>
+            </div>
+
+            <div class="lg:col-span-8 bento-card p-10 bg-slate-50 border-dashed border-slate-300">
+                <div class="quote-box">
+                    <p class="text-xl text-slate-700 font-medium italic leading-relaxed">
+                        <span data-zh="现在的跨境不再是目的地的抵达，而是生活空间的横向延伸。从‘在港赚钱，在深居住’到‘北上寻找情绪平替’，数据的缺失由个体的真实足迹填补。" data-en="Cross-border is no longer arrival, but lateral extension of life. From earning in HK, living in SZ to seeking emotional substitutes northbound, individuals fill data gaps.">现在的跨境不再是目的地的抵达，而是生活空间的横向延伸。从‘在港赚钱，在深居住’到‘北上寻找情绪平替’，数据的缺失由个体的真实足迹填补。</span>
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+                    <div class="space-y-3">
+                        <div class="h-1 w-8 bg-secondary"></div>
+                        <h4 class="font-bold text-slate-850"><span data-zh="边界感的模糊" data-en="Blurred borders">边界感的模糊</span></h4>
+                        <p class="text-xs text-slate-500"><span data-zh="“双城记”演变为“同城化”。跨境动力从刚性需求转向情绪价值与生活质量的平替。" data-en="Twin cities drift to one city; drivers shift to mood and quality.">“双城记”演变为“同城化”。跨境动力从刚性需求转向情绪价值与生活质量的平替。</span></p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="h-1 w-8 bg-secondary"></div>
+                        <h4 class="font-bold text-slate-850"><span data-zh="职住的解构与重组" data-en="Work–home reconfigured">职住的解构与重组</span></h4>
+                        <p class="text-xs text-slate-500"><span data-zh="随着远程办公渗透，“在港赚钱、在深居住”成为一种主动选择。在昂贵地段与宽敞空间之间进行精密博弈。" data-en="Remote work enables earning in HK, living in SZ; trade-offs optimize space vs. cost.">随着远程办公渗透，“在港赚钱、在深居住”成为一种主动选择。在昂贵地段与宽敞空间之间进行精密博弈。</span></p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="h-1 w-8 bg-secondary"></div>
+                        <h4 class="font-bold text-slate-850"><span data-zh="个体的深度实验" data-en="Deep individual experiments">个体的深度实验</span></h4>
+                        <p class="text-xs text-slate-500"><span data-zh="一场关于“时间 vs 金钱”与“身份认同”的生存实验。" data-en="A survival test of time vs. money and identity.">一场关于“时间 vs 金钱”与“身份认同”的生存实验。</span></p>
+                    </div>
+                </div>
+
+                <div class="mt-12 flex items-center justify-between">
+                    <span class="section-tag text-slate-400"><span data-zh="2024 群像纪实" data-en="2024 Persona">2024 Persona</span></span>
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-cyan-100 border-2 border-white"></div>
+                        <div class="w-8 h-8 rounded-full bg-cyan-200 border-2 border-white"></div>
+                        <div class="w-8 h-8 rounded-full bg-cyan-300 border-2 border-white"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center pt-20 pb-12">
+            <p class="text-slate-400 italic text-sm mb-10"><span data-zh="宏观数据终究是抽象的。为了理解这些社会变迁背后的真实红利，我们将镜头对准具体的个体。" data-en="Macro data is abstract; to see real dividends, we focus on individuals.">宏观数据终究是抽象的。为了理解这些社会变迁背后的真实红利，我们将镜头对准具体的个体。</span></p>
+            <button 
+                onclick="window.location.href='3-2.html'" 
+                class="bg-primary hover:bg-slate-850 text-white px-12 py-4 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-cyan-900/10"
+            >
+                进入叙事篇章
+            </button>
+        </footer>
+    </div>
+
+</body>
+</html>

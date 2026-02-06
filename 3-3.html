@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3 - Who Cross the Border</title>
+    
+    <!-- --- UNIFIED FONTS --- -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- --- UNIFIED ICONS (Phosphor Icons) --- -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- JS Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0E7490', // Cyan 700
+                        secondary: '#06B6D4', // Cyan 500
+                        accent: '#ECFEFF', // Cyan 50
+                        slate: { 
+                            850: '#1e293b',
+                            900: '#0f172a' 
+                        },
+                        // Emotion colors from demo
+                        emotion: {
+                            anxiety: '#f43f5e',
+                            joy: '#10b981',
+                            calm: '#64748b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        serif: ['"Noto Serif SC"', 'serif'],
+                    },
+                    boxShadow: {
+                        'glass': '0 10px 30px -10px rgba(14, 116, 144, 0.1)',
+                        'glass-hover': '0 20px 40px -10px rgba(14, 116, 144, 0.2)',
+                        'inner-groove': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+                        'float': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* GLOBAL RESET & SCROLLBAR */
+        body {
+            background-color: #f1f5f9;
+            color: #0F172A;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* --- NOISE TEXTURE --- */
+        .noise-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px -10px rgba(14, 116, 144, 0.05);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Elastic ease */
+        }
+        
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 40px -12px rgba(14, 116, 144, 0.2);
+            border-color: #A5F3FC; /* Cyan-200 */
+            transform: translateY(-2px);
+        }
+
+        /* --- TIMELINE NEW STYLES --- */
+        /* 昼夜渐变背景 */
+        .timeline-bg {
+            background: linear-gradient(90deg, 
+                #f1f5f9 0%,    /* 深夜 - 浅灰 */
+                #ffffff 10%,   /* 过渡 */
+                #ffffff 90%,   /* 纯白 */
+                #f1f5f9 100%   /* 深夜 - 浅灰 */
+            );
+            border: 1px solid #cbd5e1;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        /* Tooltip 改为绝对定位 */
+        .floating-tooltip {
+            position: absolute; 
+            pointer-events: none;
+            z-index: 50;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            transform: translateY(10px);
+            backdrop-filter: blur(12px);
+        }
+        .floating-tooltip.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .floating-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px 6px 0;
+            border-style: solid;
+            border-color: rgba(15, 23, 42, 0.95) transparent transparent transparent;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 节点文字样式 */
+        .node-label {
+            text-shadow: 0 2px 4px rgba(255,255,255,0.8);
+            pointer-events: none;
+            font-weight: 600;
+        }
+        .node-icon {
+            pointer-events: none;
+            font-size: 1.25rem;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+        }
+
+        /* Typography Precision */
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Active states for cards */
+        .profile-card.active {
+            border-color: #06B6D4;
+            background: rgba(236, 254, 255, 0.9);
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.15);
+            transform: scale(1.02);
+        }
+
+        .chapter-title-overlay {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(6rem, 18vw, 12rem);
+            font-weight: 800;
+            color: rgba(14, 116, 144, 0.03); 
+            z-index: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(148, 163, 184, 0.5); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #0E7490; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(203, 213, 225, 0.5); }
+    </style>
+</head>
+<body class="bg-slate-50 relative">
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-2xl">
+        <div class="bg-white/70 backdrop-blur-md border border-slate-200/50 shadow-lg rounded-2xl px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+                <span class="text-xs font-bold tracking-widest text-slate-800 uppercase font-mono">NBSB Research</span>
+            </div>
+            <div class="flex gap-4 md:gap-8">
+                <a href="3-1.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-1"><span data-zh="跨时空分析" data-en="Cross-Temporal Analysis">跨时空分析</span></a>
+                <a href="3-2.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-2"><span data-zh="群像纪实" data-en="Persona">Persona</span></a>
+                <a href="3-3.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-timeline"><span data-zh="跨境时间线" data-en="Cross-Border Timeline">跨境时间线</span></a>
+                <a href="4-1future_question.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-future"><span data-zh="未来议题" data-en="Future Questions">未来议题</span></a>
+            </div>
+            <button id="lang-toggle" class="text-xs font-semibold px-3 py-1 rounded-lg border border-slate-200 text-slate-600 hover:text-primary">EN</button>
+            <button onclick="window.print()" class="hidden md:block text-slate-400 hover:text-slate-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            </button>
+        </div>
+    </nav>
+
+    <style>
+        .nav-link { color: #64748b; position: relative; }
+        .nav-link.active, .nav-link:hover { color: #0E7490; }
+        .nav-link.active::after, .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #0E7490;
+            border-radius: 2px;
+        }
+        body { animation: fadeInPage 0.8s ease-out; }
+        @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+
+    <script>
+        const currentFile = window.location.pathname.split("/").pop();
+        if (currentFile === "3-1.html" || currentFile === "") {
+            document.getElementById('nav-3-1').classList.add('active');
+        } else if (currentFile === "3-2.html") {
+            document.getElementById('nav-3-2').classList.add('active');
+        } else if (currentFile === "3-3.html" || currentFile === "timeline%20copy.html") {
+            document.getElementById('nav-timeline').classList.add('active');
+        } else if (currentFile === "4-1future_question.html") {
+            document.getElementById('nav-future').classList.add('active');
+        }
+        let lang = localStorage.getItem('lang') || 'en';
+        let updateContent = () => {}; // Placeholder for function defined in DOMContentLoaded
+
+        function applyLang(l) {
+            document.querySelectorAll('[data-zh]').forEach(el => {
+                const txt = el.getAttribute(l === 'zh' ? 'data-zh' : 'data-en');
+                if (txt) el.textContent = txt;
+            });
+            document.documentElement.lang = l === 'zh' ? 'zh-CN' : 'en';
+            const btn = document.getElementById('lang-toggle');
+            if (btn) btn.textContent = l === 'zh' ? 'EN' : '中文';
+            
+            // Call dynamic content update
+            updateContent(l);
+        }
+        applyLang(lang);
+        const toggle = document.getElementById('lang-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                lang = lang === 'zh' ? 'en' : 'zh';
+                localStorage.setItem('lang', lang);
+                applyLang(lang);
+            });
+        }
+    </script>
+
+    <!-- Noise Texture Overlay -->
+    <div class="noise-bg"></div>
+
+    <div id="view-part3" class="view-container relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- ========================================================================= -->
+        <!-- NEW Interactive Timeline Section (Replaced with "Dual City 24h Ethnography") -->
+        <!-- ========================================================================= -->
+        
+        <header class="flex flex-col md:flex-row justify-between items-end mb-8 pl-2 animate-[fadeIn_0.6s_ease-out]">
+            <div class="mb-4 md:mb-0">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/50 text-slate-500 text-[10px] font-bold tracking-widest uppercase mb-3 border border-slate-200 backdrop-blur-sm">
+                    <i class="ph-database text-primary"></i> 24-Hour Ethnography
+                </div>
+                <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-3">
+                    <span data-zh="双城记：" data-en="Dual City:">双城记：</span><span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary" data-zh="24小时生活折叠" data-en="24h Folded Life">24小时生活折叠</span>
+                </h1>
+                <p class="font-serif text-slate-500 text-base max-w-2xl leading-relaxed italic">
+                    "每天60万人次的穿梭，不仅是物理距离的移动，更是两种时间刻度的折叠。"
+                </p>
+            </div>
+            
+            <!-- Legend -->
+            <div class="bg-white/80 backdrop-blur px-5 py-2.5 rounded-full flex gap-6 text-[10px] font-bold border border-slate-200 shadow-sm uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.4)]"></span>
+                    <span class="text-slate-500">Anxiety</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]"></span>
+                    <span class="text-slate-500">Joy</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                    <span class="text-slate-500">Routine</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Visualization Area -->
+        <div class="glass-card rounded-[24px] p-2 md:p-4 mb-6 relative overflow-visible group">
+            
+            <!-- Tooltip Container -->
+            <div id="tooltip" class="floating-tooltip bg-slate-900/95 text-white p-4 rounded-xl shadow-2xl border border-slate-700 min-w-[240px] max-w-[300px] text-center">
+            </div>
+            
+            <div id="chart-container" class="w-full overflow-x-auto hide-scrollbar relative timeline-bg rounded-xl cursor-crosshair py-4">
+                <!-- Sun/Moon Decor -->
+                <div class="absolute top-4 left-4 text-slate-400/30 text-xl"><i class="ph-moon"></i></div>
+                <div class="absolute top-4 left-1/2 -translate-x-1/2 text-amber-400/20 text-2xl"><i class="ph-sun"></i></div>
+                <div class="absolute top-4 right-4 text-slate-400/30 text-xl"><i class="ph-moon"></i></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div id="dashboard" class="grid grid-cols-1 md:grid-cols-10 gap-6 transition-all duration-500 min-h-[240px] mb-20">
+            
+            <!-- Time & Status Card -->
+            <div class="md:col-span-2 glass-card rounded-[20px] p-6 flex flex-col justify-center items-center text-center relative overflow-hidden group/card">
+                <div class="z-10 w-full">
+                    <h3 class="font-bold text-slate-400 text-[10px] uppercase tracking-widest mb-4 border-b border-slate-100 pb-2 inline-block px-4">
+                        <i class="ph-clock mr-1.5 text-secondary"></i> <span data-zh="当前节点" data-en="Current Node">Current Node</span>
+                    </h3>
+                    <div id="dash-time" class="font-mono text-5xl text-slate-800 font-bold mb-2 tracking-tighter">--:--</div>
+                    <div id="dash-title" class="font-sans text-lg font-bold text-primary leading-tight mt-1 truncate px-2"><span data-zh="点击节点详情" data-en="Click node for details">Click node for details</span></div>
+                </div>
+                
+                <div class="mt-8 z-10 w-full px-2">
+                    <div class="flex justify-center gap-2 text-[10px] text-slate-400 mb-2 font-mono font-bold tracking-wide">
+                        <span data-zh="预计时间" data-en="EST. TIME">EST. TIME</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden mx-auto">
+                        <div id="dash-progress" class="bg-gradient-to-r from-primary to-secondary h-1.5 rounded-full transition-all duration-1000 w-0 shadow-[0_0_10px_rgba(6,182,212,0.4)]"></div>
+                    </div>
+                </div>
+                <!-- Subtle Decoration -->
+                <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-gradient-to-br from-secondary/5 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+            </div>
+
+            <!-- Monologue Card -->
+            <div class="md:col-span-5 glass-card rounded-[20px] p-8 relative flex flex-col justify-center items-center text-center border-t-4 border-t-transparent hover:border-t-primary transition-colors">
+                <h3 class="absolute top-4 font-bold text-slate-400 text-[10px] uppercase tracking-widest flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> <span data-zh="内心独白" data-en="Inner Voice">Inner Voice</span>
+                </h3>
+                
+                <div class="mt-6 flex flex-col items-center gap-4 w-full h-full justify-center">
+                    <div id="dash-emoji" class="text-4xl filter drop-shadow-sm grayscale opacity-80 mb-2">💭</div>
+                    <div class="relative z-10 w-full px-4 overflow-y-auto max-h-[160px] custom-scrollbar">
+                        <p id="dash-monologue" class="font-serif text-xl md:text-2xl text-slate-700 italic leading-relaxed font-medium">
+                            <span data-zh='"每个节点背后，都藏着一段未曾说出的心声..."' data-en='"Behind every node, there is an unspoken voice..."'>"Behind every node, there is an unspoken voice..."</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-8xl text-slate-200 font-serif select-none -z-0 opacity-20">“</div>
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-8xl text-slate-200 font-serif select-none -z-0 opacity-20">”</div>
+            </div>
+
+            <!-- Context Card -->
+            <div class="md:col-span-3 glass-card rounded-[20px] p-6 flex flex-col items-center text-center bg-slate-50/50">
+                <h3 class="font-bold text-slate-400 text-[10px] uppercase tracking-widest mb-6 inline-block border-b border-slate-200 pb-1">
+                    <i class="ph-map-pin mr-1.5 text-secondary"></i> <span data-zh="场景与标签" data-en="Context & Tags">Context & Tags</span>
+                </h3>
+                
+                <div id="dash-tags" class="flex flex-wrap justify-center content-start gap-2 mb-auto">
+                    <span class="px-3 py-1.5 bg-white text-slate-300 rounded-lg text-[10px] border border-slate-100 font-mono shadow-sm"><span data-zh="暂无数据" data-en="NO_DATA">NO_DATA</span></span>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-slate-200/60 w-full">
+                    <p id="dash-context-text" class="text-xs text-slate-500 leading-relaxed font-medium px-2">
+                        <span data-zh="此处将显示该场景下的补充信息。" data-en="Supplementary info will be shown here.">Supplementary info will be shown here.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Page Button -->
+        <div class="text-center py-12">
+            <a href="border_issues.html" class="inline-flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full text-slate-600 font-medium shadow-sm hover:shadow-md hover:text-primary hover:border-primary transition-all group">
+                <span data-zh="下一页：边界的未解难题与未来" data-en="Next Page: Border’s Unresolved Challenges and Future">Next Page: Border’s Unresolved Challenges and Future</span>
+                <i class="ph-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- THEME CONFIG ---
+            const THEME = {
+                primary: '#0E7490',      
+                secondary: '#06B6D4',    
+                accent: '#22D3EE',
+                emotion: {
+                    anxiety: '#f43f5e',
+                    joy: '#10b981',
+                    calm: '#64748b'
+                }     
+            };
+
+            // --- 1. NEW DATA STRUCTURE (Ethnography) ---
+            const EMOTIONS = { ANXIETY: 'anxiety', JOY: 'joy', CALM: 'calm' };
+            const COLORS = {
+                anxiety: THEME.emotion.anxiety, 
+                joy: THEME.emotion.joy,     
+                calm: THEME.emotion.calm     
+            };
+
+            function tr3(s) {
+                const dict = {
+                    "起床": "Wake Up",
+                    "抵达口岸": "Arrive at Border",
+                    "过关": "Border Crossing",
+                    "抵达学校": "Arrive at School",
+                    "离开学校": "Leave School",
+                    "赴港上班": "Work in Hong Kong",
+                    "抵达公司": "Arrive at Office",
+                    "离开公司": "Leave Office",
+                    "到港": "Arrive in Hong Kong",
+                    "出发": "Departure",
+                    "消费娱乐": "Consumption & Entertainment",
+                    "准备返程": "Prepare to Return",
+                    "睡眠不足": "Sleep Deprivation",
+                    "书包超重": "Heavy Backpack",
+                    "跨境校巴": "Cross-border School Bus",
+                    "车内补觉": "Nap on Bus",
+                    "学童通道": "Student Lane",
+                    "快速通关": "Fast Clearance",
+                    "香港校园": "Hong Kong Campus",
+                    "语言切换": "Language Switch",
+                    "放学时刻": "After-school Time",
+                    "准点发车": "On-time Bus",
+                    "深圳早高峰": "Shenzhen Rush Hour",
+                    "口岸停车": "Border Parking",
+                    "E通道": "E-Channel",
+                    "信号切换": "Signal Switch",
+                    "中环/金钟": "Central/Admiralty",
+                    "高压职场": "High-pressure Workplace",
+                    "准点下班": "Leave on Time",
+                    "赶车族": "Catch-the-train Crowd",
+                    "拥挤车厢": "Crowded Carriage",
+                    "回邮件": "Reply Emails",
+                    "港式早餐": "HK-style Breakfast",
+                    "从容早晨": "Leisurely Morning",
+                    "反向空车": "Reverse-direction Empty Train",
+                    "必有座位": "Seats Guaranteed",
+                    "支付切换": "Payment Switch",
+                    "丝滑通关": "Smooth Clearance",
+                    "科技园": "Tech Park",
+                    "发展机遇": "Growth Opportunity",
+                    "聚餐文化": "Dining Culture",
+                    "高性价比": "High Cost-performance",
+                    "晚高峰": "Evening Rush",
+                    "烟火气": "Human Warmth",
+                    "家庭日": "Family Day",
+                    "空箱出发": "Empty Suitcase",
+                    "轻松过关": "Easy Clearance",
+                    "期待美食": "Anticipate Food",
+                    "按摩SPA": "Massage & SPA",
+                    "跨境看牙": "Cross-border Dental Care",
+                    "山姆/Costco": "Sam’s/Costco",
+                    "满载而归": "Loaded Return",
+                    "拉杆箱大军": "Suitcase Crowd",
+                    "快乐的疲惫": "Happy Fatigue",
+                    "巴士回家": "Bus Home",
+                    "翻看照片": "Review Photos"
+                };
+                return lang === 'en' ? (dict[s] || s) : s;
+            }
+
+            const rawData = [
+                {
+                    id: "student", name: "跨境学童", nameEn: "Cross-border Student", tag: "每日往返", tagEn: "Daily Commute",
+                    avatar: "https://api.dicebear.com/7.x/notionists/svg?seed=student&backgroundColor=e0f2fe", 
+                    events: [
+                        { time: 6.0, label: "起床", labelEn: "Wake Up", icon: "⏰", emotion: EMOTIONS.ANXIETY, tags: ["⏰ 睡眠不足", "🎒 书包超重"], tagsEn: ["⏰ Sleep Deprived", "🎒 Heavy Bag"], monologue: "闹钟响了第三遍。天还是黑的，妈妈塞给我一盒牛奶，催我快点穿鞋。书包好像比昨天更重了。", monologueEn: "Alarm rang 3 times. Still dark. Mom gave me milk, urged me to hurry. Backpack feels heavier than yesterday." },
+                        { time: 6.75, label: "抵达口岸", labelEn: "Arrive at Border", icon: "🚌", emotion: EMOTIONS.CALM, tags: ["🚌 跨境校巴", "❄️ 车内补觉"], tagsEn: ["🚌 School Bus", "❄️ Napping"], monologue: "在保姆车上补了一觉，被冷气冻醒。窗外全是红色的车尾灯，深圳的早晨是从车流开始的。", monologueEn: "Napped on nanny bus, woke up by cold AC. Outside is red tail lights. Shenzhen morning starts with traffic." },
+                        { time: 7.25, label: "过关", labelEn: "Crossing", icon: "🛂", emotion: EMOTIONS.JOY, tags: ["✅ 学童通道", "⚡️ 快速通关"], tagsEn: ["✅ Student Lane", "⚡️ Fast Pass"], monologue: "熟练地掏出证件，'滴'一声秒过。不用像游客那样排长队，这大概是做跨境学童唯一的特权了。", monologueEn: "Skilled at ID check, passed in seconds. No long queues like tourists. The only privilege of being a cross-border student." },
+                        { time: 8.0, label: "抵达学校", labelEn: "Arrive School", icon: "🏫", emotion: EMOTIONS.JOY, tags: ["🏫 香港校园", "🗣️ 语言切换"], tagsEn: ["🏫 HK Campus", "🗣️ Lang Switch"], monologue: "终于到了。换上广东话频道，和同学交换昨晚没看完的漫画。这一刻，早起的痛苦好像消失了。", monologueEn: "Finally here. Switch to Cantonese mode, swap comics with classmates. Early morning pain seems gone." },
+                        { time: 15.5, label: "离开学校", labelEn: "Leave School", icon: "👋", emotion: EMOTIONS.JOY, tags: ["👋 放学时刻", "🚌 准点发车"], tagsEn: ["👋 After School", "🚌 On Time"], monologue: "放学钟声响起！虽然想留在学校踢球，但如果不赶这班车，回家就要摸黑了。再见，香港。", monologueEn: "School bell! Wanted to play soccer, but must catch the bus or go home in dark. Bye Hong Kong." },
+                        { time: 16.5, label: "抵达口岸", labelEn: "Arrive Border", icon: "🌉", emotion: EMOTIONS.CALM, tags: ["🌉 深圳湾", "🍪 零食时间"], tagsEn: ["🌉 Shenzhen Bay", "🍪 Snack Time"], monologue: "车上大家都在发呆或吃零食。看着窗外的夕阳照在深圳湾大桥上，我知道离家近了，离补习班也近了。", monologueEn: "Everyone staring blankly or eating snacks on bus. Sunset on Shenzhen Bay Bridge means home is near, so is tutoring." }
+                    ]
+                },
+                {
+                    id: "worker_sz", name: "赴港上班", nameEn: "HK Worker in SZ", tag: "特种兵", tagEn: "Commuter",
+                    avatar: "https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=ffedd5",
+                    events: [
+                        { time: 6.5, label: "起床", labelEn: "Wake Up", icon: "🌅", emotion: EMOTIONS.CALM, tags: ["🌅 错峰出行", "☕️ 晨间咖啡"], tagsEn: ["🌅 Off-peak", "☕️ Morning Coffee"], monologue: "为了避开学童大军，必须这个点起。在这个城市醒来，去另一个城市赚钱。这已是第500天的日常。", monologueEn: "Must wake up now to avoid student rush. Wake up in this city, earn money in another. 500th day of this routine." },
+                        { time: 7.25, label: "抵达口岸", labelEn: "Arrive Border", icon: "🚇", emotion: EMOTIONS.ANXIETY, tags: ["🚇 深圳早高峰", "🚗 口岸停车"], tagsEn: ["🚇 SZ Rush Hour", "🚗 Parking"], monologue: "把车停在深圳湾，或者挤上4号线。大家都行色匆匆，没人说话，空气里弥漫着豆浆味和焦虑感。", monologueEn: "Park at Shenzhen Bay or squeeze into Line 4. Everyone rushing, silent, air smells of soy milk and anxiety." },
+                        { time: 7.75, label: "过关", labelEn: "Crossing", icon: "✅", emotion: EMOTIONS.JOY, tags: ["✅ E通道", "📶 信号切换"], tagsEn: ["✅ E-Channel", "📶 Signal Switch"], monologue: "E通道没人排队，舒服！跨过那条线，手机信号从移动切到CSL，微信静音，WhatsApp开始响个不停。", monologueEn: "E-Channel empty, nice! Cross the line, signal switches to CSL, WeChat mutes, WhatsApp starts buzzing." },
+                        { time: 9.0, label: "抵达公司", labelEn: "Arrive Office", icon: "🏙️", emotion: EMOTIONS.ANXIETY, tags: ["💼 中环/金钟", "🏙️ 高压职场"], tagsEn: ["💼 Central/Admiralty", "🏙️ High Pressure"], monologue: "从中环站出来，融入西装革履的人潮。买杯40港币的咖啡，深吸一口气，开始高强度的战斗。", monologueEn: "Exit Central station, merge into suits crowd. Buy HK$40 coffee, deep breath, start high-intensity battle." },
+                        { time: 18.0, label: "离开公司", labelEn: "Leave Office", icon: "🌙", emotion: EMOTIONS.CALM, tags: ["🌙 准点下班", "🏃 赶车族"], tagsEn: ["🌙 Leave on Time", "🏃 Rushing"], monologue: "终于合上电脑。同事们还在加班，但我必须走了。灰姑娘的水晶鞋是有时效的，我的时效是末班车。", monologueEn: "Laptop closed. Colleagues still working, but I must go. Cinderella's magic fades, mine is the last train." },
+                        { time: 19.0, label: "抵达口岸", labelEn: "Arrive Border", icon: "🐟", emotion: EMOTIONS.ANXIETY, tags: ["🐟 拥挤车厢", "📧 回邮件"], tagsEn: ["🐟 Crowded", "📧 Replying Email"], monologue: "金钟到落马洲的车厢永远像沙丁鱼罐头。练就了单手抓扶手、单手回邮件的本事。耳机里播客的声音是唯一的慰藉。", monologueEn: "Admiralty to Lok Ma Chau is always packed like sardines. Mastered one-hand rail holding, one-hand email replying. Podcast is the only comfort." }
+                    ]
+                },
+                {
+                    id: "worker_hk", name: "留港硕士", nameEn: "SZ Worker in HK", tag: "深造镀金", tagEn: "Career Seeker",
+                    avatar: "https://api.dicebear.com/7.x/notionists/svg?seed=Aneka&backgroundColor=d1fae5",
+                    events: [
+                        { time: 7.5, label: "起床", labelEn: "Wake Up", icon: "🍳", emotion: EMOTIONS.JOY, tags: ["🍳 港式早餐", "😌 从容早晨"], tagsEn: ["🍳 HK Breakfast", "😌 Leisure Morning"], monologue: "可以在茶餐厅慢悠悠吃个A餐再出发。看着对面月台挤满去港岛的人，心里暗自庆幸我是'逆行者'。", monologueEn: "Slowly enjoy Set A breakfast at Cha Chaan Teng. Watching crowded platform opposite, glad I'm a 'reverse commuter'." },
+                        { time: 8.25, label: "抵达口岸", labelEn: "Arrive Border", icon: "🚄", emotion: EMOTIONS.JOY, tags: ["🚄 反向空车", "💺 必有座位"], tagsEn: ["🚄 Empty Train", "💺 Guaranteed Seat"], monologue: "坐东铁线北上，车厢空荡荡，甚至可以挑个靠窗的位置看风景。这就是反向通勤的快乐。", monologueEn: "Northbound East Rail Line, empty carriage, picked window seat. Joy of reverse commute." },
+                        { time: 8.5, label: "过关", labelEn: "Crossing", icon: "🛂", emotion: EMOTIONS.JOY, tags: ["📱 支付切换", "🛂 丝滑通关"], tagsEn: ["📱 Payment Switch", "🛂 Smooth Entry"], monologue: "走香港居民通道，丝滑入境深圳。把钱包收起来，掏出手机打开支付宝/微信，切换成内地生存模式。", monologueEn: "HK Resident channel, smooth entry to SZ. Hide wallet, open Alipay/WeChat, switch to Mainland survival mode." },
+                        { time: 9.0, label: "抵达公司", labelEn: "Arrive Office", icon: "💻", emotion: EMOTIONS.CALM, tags: ["💻 科技园", "🚀 发展机遇"], tagsEn: ["💻 Tech Park", "🚀 Opportunity"], monologue: "南山科技园，全是玻璃幕墙和年轻人。虽然工资账面少点，但这里有午休床，还有更广阔的上升空间。", monologueEn: "Nanshan Tech Park, glass walls and young people. Lower salary on paper, but nap beds and wider growth space." },
+                        { time: 18.0, label: "离开公司", labelEn: "Leave Office", icon: "🍲", emotion: EMOTIONS.JOY, tags: ["🍲 聚餐文化", "💰 高性价比"], tagsEn: ["🍲 Dining Culture", "💰 High Value"], monologue: "下班不急着回香港。同事吆喝着去吃椰子鸡，这一锅在香港要卖300，这里只要100出头。走起！", monologueEn: "No rush to return. Colleagues going for Coconut Chicken, HK$100 here vs HK$300 there. Let's go!" },
+                        { time: 19.0, label: "抵达口岸", labelEn: "Arrive Border", icon: "🚇", emotion: EMOTIONS.CALM, tags: ["🚇 晚高峰", "🏙️ 烟火气"], tagsEn: ["🚇 Evening Rush", "🏙️ Human Warmth"], monologue: "带着一身火锅味坐地铁去口岸。深圳的晚高峰也很堵，但相比香港的冷漠，这里多了点烟火气。", monologueEn: "Smelling of hotpot on subway to border. Shenzhen evening rush is jammed, but unlike HK's coldness, here has human warmth." }
+                    ]
+                },
+                {
+                    id: "consumer", name: "北上消费", nameEn: "NB Consumer", tag: "周末扫货", tagEn: "Shopping",
+                    avatar: "https://api.dicebear.com/7.x/notionists/svg?seed=Grandma&backgroundColor=fee2e2",
+                    events: [
+                        { time: 9.0, label: "出发", labelEn: "Departure", icon: "🧳", emotion: EMOTIONS.JOY, tags: ["👨‍👩‍👧‍👦 家庭日", "🧳 空箱出发"], tagsEn: ["👨‍👩‍👧‍👦 Family Day", "🧳 Empty Suitcase"], monologue: "周末睡到自然醒。全家出动！这周的目标是山姆超市和那家新开的酸菜鱼。带上那个最大的拉杆箱。", monologueEn: "Slept in. Family outing! Target: Sam's Club and new Sauerkraut Fish place. Bring the biggest suitcase." },
+                        { time: 10.0, label: "过关", labelEn: "Crossing", icon: "😋", emotion: EMOTIONS.JOY, tags: ["🛂 轻松过关", "😋 期待美食"], tagsEn: ["🛂 Easy Pass", "😋 Expecting Food"], monologue: "虽然莲塘口岸人也不少，但大家脸上都写着期待。看到'深圳欢迎您'的大字，胃口已经打开了。", monologueEn: "Liantang port crowded, but everyone looks expectant. Seeing 'Welcome to Shenzhen', appetite is already open." },
+                        { time: 11.0, label: "消费娱乐", labelEn: "Entertainment", icon: "💆", emotion: EMOTIONS.JOY, tags: ["💆 按摩SPA", "🦷 跨境看牙"], tagsEn: ["💆 Massage SPA", "🦷 Dental Care"], monologue: "这是什么神仙物价！按摩只要香港的三分之一，服务还这么好。老婆去做美甲了，我正好去洗个牙。", monologueEn: "Godly prices! Massage 1/3 of HK price, great service. Wife doing nails, I'm cleaning teeth." },
+                        { time: 21.0, label: "准备返程", labelEn: "Return Prep", icon: "🛒", emotion: EMOTIONS.CALM, tags: ["🛒 山姆/Costco", "🛍️ 满载而归"], tagsEn: ["🛒 Sam's/Costco", "🛍️ Fully Loaded"], monologue: "这就是传说中的仓储超市吗？巨大的烤鸡、成山的草莓。拉杆箱已经塞不下了，手里还提着两袋。", monologueEn: "Legendary warehouse supermarket? Giant roast chicken, mountains of strawberries. Suitcase full, carrying two bags." },
+                        { time: 22.0, label: "过关", labelEn: "Crossing", icon: "😫", emotion: EMOTIONS.ANXIETY, tags: ["📦 拉杆箱大军", "😫 快乐的疲惫"], tagsEn: ["📦 Suitcase Army", "😫 Happy Tired"], monologue: "大家都挑这个点回去。口岸全是拖着箱子的人，像春运一样。腿好酸，但看着这一堆战利品，值了！", monologueEn: "Everyone leaving now. Border full of suitcases. Legs sore, but seeing the loot, worth it!" },
+                        { time: 22.5, label: "到港", labelEn: "Arrive HK", icon: "🚌", emotion: EMOTIONS.JOY, tags: ["🚌 巴士回家", "📸 翻看照片"], tagsEn: ["🚌 Bus Home", "📸 Photos"], monologue: "坐上回家的巴士，翻看今天的照片。听说万象城又开了新店，下周还要再来。", monologueEn: "On bus home, browsing photos. Heard MixC opened new shops, coming back next week." }
+                    ]
+                }
+            ];
+
+            rawData.forEach(p => {
+                p.events = p.events.filter(e => e.time >= 5 && e.time <= 22);
+            });
+
+            // --- 2. D3 RENDER LOGIC ---
+            function renderTimeline() {
+                const container = d3.select("#chart-container");
+                const containerNode = document.getElementById("chart-container");
+                // Dynamic width based on container, ensuring min width for scroll
+                const width = Math.max(containerNode.clientWidth, 1200); 
+                const height = 480; 
+                const margin = { top: 70, right: 60, bottom: 40, left: 100 };
+
+                // Clear existing SVG if any
+                container.selectAll("svg").remove();
+
+                const svg = container.append("svg")
+                    .attr("id", "timeline-svg")
+                    .attr("width", width)
+                    .attr("height", height);
+
+                // Scales
+                const xScale = d3.scaleLinear().domain([5, 22]).range([margin.left, width - margin.right]);
+                const yScale = d3.scalePoint().domain(rawData.map(d => d.id)).range([margin.top, height - margin.bottom]).padding(0.7);
+
+                // --- 3. TIMELINE AXIS ---
+                const allHours = d3.range(5, 23);
+                const majorHours = [5, 8, 12, 16, 20, 22]; 
+
+                const axisGroup = svg.append("g");
+
+                allHours.forEach(h => {
+                    const isMajor = majorHours.includes(h);
+                    const xPos = xScale(h);
+                    
+                    // Ticks
+                    axisGroup.append("line")
+                        .attr("x1", xPos).attr("x2", xPos)
+                        .attr("y1", margin.top - (isMajor ? 12 : 6)) 
+                        .attr("y2", margin.top)
+                        .attr("stroke", isMajor ? "#94a3b8" : "#cbd5e1")
+                        .attr("stroke-width", isMajor ? 1.5 : 1);
+
+                    // Grid lines
+                    if (isMajor) {
+                        axisGroup.append("line")
+                            .attr("x1", xPos).attr("x2", xPos)
+                            .attr("y1", margin.top).attr("y2", height - margin.bottom)
+                            .attr("stroke", "#94a3b8").attr("stroke-opacity", 0.1)
+                            .attr("stroke-dasharray", "4 4");
+                    }
+
+                    // Time Labels
+                    axisGroup.append("text")
+                        .attr("x", xPos)
+                        .attr("y", margin.top - (isMajor ? 18 : 12))
+                        .attr("text-anchor", "middle")
+                        .attr("class", `font-mono ${isMajor ? 'text-sm font-bold fill-slate-600' : 'text-[10px] fill-slate-400'} tabular-nums`)
+                        .text(`${h}:00`);
+                });
+
+                // --- 4. SWIMLANES & TRACKS ---
+                const swimlanes = svg.selectAll(".swimlane")
+                    .data(rawData).enter().append("g");
+
+                rawData.forEach(person => {
+                    // Background Track
+                    svg.append("rect")
+                        .attr("x", xScale(5))
+                        .attr("y", yScale(person.id) - 3)
+                        .attr("width", xScale(22) - xScale(5))
+                        .attr("height", 6)
+                        .attr("rx", 3)
+                        .attr("fill", "#f1f5f9"); 
+
+                    // Event Segments
+                    for(let i = 0; i < person.events.length - 1; i++) {
+                        const curr = person.events[i];
+                        const next = person.events[i+1];
+                        const startX = xScale(curr.time);
+                        const endX = xScale(next.time);
+                        const y = yScale(person.id);
+                        
+                        const colorMap = {
+                            'anxiety': 'rgba(244, 63, 94, 0.4)', 
+                            'joy': 'rgba(16, 185, 129, 0.4)',     
+                            'calm': 'rgba(100, 116, 139, 0.4)'   
+                        };
+
+                        svg.append("rect")
+                            .attr("x", startX)
+                            .attr("y", y - 3)
+                            .attr("width", endX - startX)
+                            .attr("height", 6) 
+                            .attr("rx", 3)
+                            .attr("fill", colorMap[curr.emotion])
+                            .attr("class", "transition-opacity hover:opacity-100 opacity-80");
+                    }
+                });
+
+                // Headers (Avatars & Names)
+                const headers = swimlanes.append("g")
+                    .attr("transform", d => `translate(10, ${yScale(d.id)})`); 
+                
+                headers.append("defs").append("clipPath")
+                    .attr("id", d => `clip-${d.id}`)
+                    .append("circle").attr("cx", 24).attr("cy", 0).attr("r", 24);
+                
+                headers.append("circle")
+                    .attr("cx", 24).attr("cy", 0).attr("r", 26)
+                    .attr("fill", "white")
+                    .attr("stroke", "#e2e8f0")
+                    .attr("stroke-width", 2);
+
+                headers.append("image")
+                    .attr("xlink:href", d => d.avatar)
+                    .attr("x", 0).attr("y", -24)
+                    .attr("width", 48).attr("height", 48)
+                    .attr("clip-path", d => `url(#clip-${d.id})`);
+
+                const labelGroup = headers.append("g").attr("transform", "translate(60, -8)");
+                
+                labelGroup.append("text")
+                    .attr("class", "header-name font-sans font-bold text-sm fill-slate-800")
+                    .text(d => lang === 'en' ? (d.nameEn || d.name) : d.name);
+
+                labelGroup.append("rect")
+                    .attr("y", 6)
+                    .attr("width", 64).attr("height", 18)
+                    .attr("rx", 4)
+                    .attr("fill", "#f1f5f9")
+                    .attr("stroke", "#e2e8f0");
+                
+                labelGroup.append("text")
+                    .attr("x", 32).attr("y", 18)
+                    .attr("text-anchor", "middle")
+                    .attr("class", "header-tag font-mono text-[9px] fill-slate-500 font-bold uppercase tracking-wide")
+                    .text(d => lang === 'en' ? (d.tagEn || d.tag) : d.tag);
+
+
+                // --- 5. INTERACTIVE NODES ---
+                const tooltip = document.getElementById('tooltip');
+
+                rawData.forEach(person => {
+                    const group = svg.append("g");
+                    const nodes = group.selectAll(".node")
+                        .data(person.events).enter().append("g")
+                        .attr("class", "node cursor-pointer group")
+                        .attr("transform", d => `translate(${xScale(d.time)}, ${yScale(person.id)})`);
+
+                    // Node Circle
+                    nodes.append("circle")
+                        .attr("r", 6)
+                        .attr("fill", d => COLORS[d.emotion])
+                        .attr("stroke", "white")
+                        .attr("stroke-width", 2)
+                        .attr("class", "shadow-sm transition-all duration-300 group-hover:scale-150 group-hover:stroke-4");
+
+                    // Icon (Above)
+                    nodes.append("text")
+                        .attr("y", -18) 
+                        .attr("text-anchor", "middle")
+                        .attr("class", "node-icon text-xl") 
+                        .text(d => d.icon);
+
+                    // Label (Below, staggered)
+                    nodes.append("text")
+                        .attr("y", (d, i) => 22 + (i % 2) * 12)
+                        .attr("text-anchor", "middle")
+                        .attr("class", "node-label font-sans text-[10px] font-bold fill-slate-400 group-hover:fill-primary transition-colors")
+                        .text(d => lang === 'en' ? (d.labelEn || d.label) : d.label);
+
+                    // Events
+                    nodes
+                        .on("mouseenter", function(event, d) {
+                            const cx = xScale(d.time); 
+                            const cy = yScale(person.id); 
+                            
+                            const tagsList = lang === 'en' ? (d.tagsEn || d.tags) : d.tags;
+                            const cleanTags = tagsList.map(t => t.replace(/[\[\]]/g, ''));
+                            const mono = lang === 'en' ? (d.monologueEn || d.monologue) : d.monologue;
+                            const shortMono = mono.substring(0, 35) + (mono.length > 35 ? '...' : '');
+                            const labelText = lang === 'en' ? (d.labelEn || d.label) : d.label;
+
+                            tooltip.innerHTML = `
+                                <div class="flex flex-col items-center gap-2">
+                                    <div class="text-xs font-mono text-slate-400 font-bold tracking-wider border-b border-slate-700 pb-1 mb-1">${formatTime(d.time)}</div>
+                                    <div class="text-sm font-bold text-white">${labelText}</div>
+                                    <div class="text-[10px] text-slate-300 italic leading-tight px-2">"${shortMono}"</div>
+                                    <div class="flex gap-1 flex-wrap justify-center mt-1">
+                                        ${cleanTags.map(t => `<span class="px-2 py-0.5 bg-slate-700 rounded text-[9px] text-cyan-200 border border-slate-600 shadow-sm">${t}</span>`).join('')}
+                                    </div>
+                                </div>
+                            `;
+                            
+                            tooltip.classList.add('active');
+
+                            const tooltipRect = tooltip.getBoundingClientRect();
+                            const tooltipWidth = tooltipRect.width;
+                            const tooltipHeight = tooltipRect.height;
+
+                            let leftPos = cx;
+                            let topPos = cy - tooltipHeight - 30; 
+                            
+                            // NOTE: Adjusting for scrolling container coordinates relative to viewport is complex here
+                            // Simplification: Showing tooltip relative to node's visual position inside SVG
+                            // For a scrollable SVG inside a div, using event.layerX/Y is better or fixed positioning logic
+                            // Here we use simple offset from the SVG element
+                            
+                            // Correction: Since chart-container is scrollable relative, we need to map svg coords to tooltip absolute coords
+                            // But tooltip is absolute inside relative container? Yes in HTML structure above.
+                            
+                            if (leftPos - tooltipWidth/2 < 10) leftPos = tooltipWidth/2 + 10;
+                            if (leftPos + tooltipWidth/2 > width - 10) leftPos = width - tooltipWidth/2 - 10;
+
+                            tooltip.style.left = `${leftPos - tooltipWidth/2}px`;
+                            tooltip.style.top = `${topPos}px`;
+                        })
+                        .on("mouseleave", function() {
+                            tooltip.classList.remove('active');
+                        })
+                        .on("click", function(event, d) {
+                            updateDashboard(d);
+                        });
+                });
+
+                // Cursor Line
+                const cursorLine = svg.append("line")
+                    .attr("class", "cursor-line")
+                    .attr("y1", margin.top).attr("y2", height - margin.bottom)
+                    .attr("stroke", "#0E7490")
+                    .attr("stroke-width", 1.5)
+                    .attr("stroke-dasharray", "4 4")
+                    .style("opacity", 0);
+
+                svg.on("mousemove", function(event) {
+                    const [mx] = d3.pointer(event);
+                    if (mx < margin.left || mx > width - margin.right) {
+                        cursorLine.style("opacity", 0); return;
+                    }
+                    cursorLine.attr("x1", mx).attr("x2", mx).style("opacity", 1);
+                }).on("mouseleave", () => cursorLine.style("opacity", 0));
+            }
+
+            // --- 6. HELPERS & DASHBOARD UPDATE ---
+            function formatTime(timeVal) {
+                const h = Math.floor(timeVal);
+                const m = Math.round((timeVal - h) * 60);
+                return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+            }
+
+            function updateDashboard(d) {
+                // Time
+                document.getElementById('dash-time').textContent = formatTime(d.time);
+                // Title
+                document.getElementById('dash-title').textContent = `${lang==='en' ? (d.labelEn || d.label) : d.label}`;
+                
+                // Progress Bar
+                const bar = document.getElementById('dash-progress');
+                bar.style.width = `100%`;
+                
+                const colorClass = {
+                    'anxiety': 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.4)]',
+                    'joy': 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]',
+                    'calm': 'bg-slate-400 shadow-[0_0_10px_rgba(148,163,184,0.4)]'
+                };
+                bar.className = `h-1.5 rounded-full transition-all duration-500 ${colorClass[d.emotion]}`;
+
+                // Monologue
+                const mono = lang==='en' ? (d.monologueEn || d.monologue) : d.monologue;
+                document.getElementById('dash-monologue').innerHTML = `“ ${mono} ”`;
+                document.getElementById('dash-emoji').textContent = d.icon;
+
+                // Tags
+                const tagContainer = document.getElementById('dash-tags');
+                tagContainer.innerHTML = '';
+                const tagsList = lang === 'en' ? (d.tagsEn || d.tags) : d.tags;
+                const cleanTags = tagsList.map(t => t.replace(/[\[\]]/g, ''));
+                cleanTags.forEach(tag => {
+                    const el = document.createElement('span');
+                    // Updated tag style to match theme
+                    el.className = "px-3 py-1 bg-white text-primary font-bold rounded-full text-[10px] border border-secondary/20 font-mono tracking-wide uppercase shadow-sm";
+                    el.textContent = tag;
+                    tagContainer.appendChild(el);
+                });
+                
+                // Context
+                const monoFull = mono;
+                document.getElementById('dash-context-text').textContent = lang==='en' ? (monoFull.split('.')[0] + '.') : (monoFull.split('。')[0] + '。');
+            }
+
+
+            // --- PROFILE LIST LOGIC (Original Profile Section Logic Preserved) ---
+            const commuterProfiles = [
+                {
+                    id: 'student',
+                    icon: 'student',
+                    title: '跨境学童',
+                    titleEn: 'Cross-border Student',
+                    description: '每天清晨，口岸大厅里排着整齐队伍的小学生。2023年秋季新学年，近3万名学童穿梭两地。',
+                    descriptionEn: 'Every morning, primary school students queue neatly at the border hall. In the fall of 2023, nearly 30,000 students shuttle between the two places.',
+                    details: {
+                        motivation: '香港拥有多元化的国际教育体系和优质教学资源，吸引了大量深圳家庭。',
+                        motivationEn: 'Hong Kong has a diversified international education system and high-quality teaching resources, attracting a large number of Shenzhen families.',
+                        schedule: '三年级的小梁每天6:00就得起床，背上10斤重的书包。7:00登上港中旅跨境校巴，经深圳湾口岸专用通道，8:00前抵港。',
+                        scheduleEn: 'Third-grader Xiao Liang gets up at 6:00 every day, carrying a 5kg schoolbag. Boards the cross-border school bus at 7:00, passes through Shenzhen Bay port via special lane, arrives in HK before 8:00.',
+                        challenges: [
+                            '68%的跨境学童通勤时间超过1小时，睡眠严重不足。',
+                            '无法参加香港学校的课后活动，40%的学童失去了在港社交圈。',
+                            '需适应两地不同的文化和考试制度，承受双重压力。'
+                        ],
+                        challengesEn: [
+                            '68% of cross-border students commute for more than 1 hour, suffering from severe sleep deprivation.',
+                            'Unable to participate in after-school activities in HK, 40% of students lost their social circle in HK.',
+                            'Need to adapt to different cultures and exam systems in both places, bearing double pressure.'
+                        ],
+                        thoughts: '"我最大的愿望是能参加学校的足球队，但每天放学就得赶巴士..." - 小梁，10岁',
+                        thoughtsEn: '"My biggest wish is to join the school soccer team, but I have to catch the bus every day after school..." - Xiao Liang, 10 years old'
+                    }
+                },
+                {
+                    id: 'worker-sz',
+                    icon: 'briefcase',
+                    title: '居深港人',
+                    titleEn: 'HK Resident in SZ',
+                    description: '享受深圳较低的生活成本和宽敞居住空间，同时赚取香港的高薪酬。',
+                    descriptionEn: 'Enjoying lower cost of living and spacious housing in Shenzhen while earning high salary in Hong Kong.',
+                    details: {
+                        motivation: '44岁的波特在香港金融业工作，但高昂的房价让他选择深圳。',
+                        motivationEn: '44-year-old Potter works in HK finance, but high housing prices made him choose Shenzhen.',
+                        schedule: '8:00深圳起床，8:45地铁至福田口岸，9:10换乘东铁线，10:00抵中环。晚上9:00才能回到深圳的家。',
+                        scheduleEn: 'Wake up at 8:00 in SZ, 8:45 subway to Futian Port, 9:10 East Rail Line, arrive Central at 10:00. Back home in SZ at 9:00 PM.',
+                        challenges: [
+                            '每日通勤消耗巨大精力，"双城生活"实则是"双城奔波"。',
+                            '在内地申请贷款仍有门槛，社交圈被割裂在河两岸。',
+                            '两地医疗体系差异大，跨境就医报销仍有壁垒。'
+                        ],
+                        challengesEn: [
+                            'Daily commute consumes huge energy, "dual-city life" is actually "dual-city rush".',
+                            'Threshold for applying loans in Mainland, social circle split across the river.',
+                            'Huge difference in medical systems, barriers in cross-border medical reimbursement.'
+                        ],
+                        thoughts: '"虽然奔波，但能给家人住100平米的大房子，而不是香港的劏房，值得。" - 波特，44岁',
+                        thoughtsEn: '"Although rushing, it\'s worth it to give family a 100sqm house instead of a subdivided flat in HK." - Potter, 44 years old'
+                    }
+                },
+                {
+                    id: 'worker-hk',
+                    icon: 'office-chair',
+                    title: '居港深人',
+                    titleEn: 'SZ Worker in HK',
+                    description: '被深圳蓬勃发展的科技、金融行业吸引，赴深寻求职业机遇的香港青年。',
+                    descriptionEn: 'Hong Kong youth attracted by Shenzhen\'s booming tech and finance industries, seeking career opportunities in SZ.',
+                    details: {
+                        motivation: '32岁的李尊明被深圳的科创氛围吸引。',
+                        motivationEn: '32-year-old Li Zunming was attracted by Shenzhen\'s sci-tech innovation atmosphere.',
+                        schedule: '居于香港北区，乘东铁线至落马洲，过关换乘深圳地铁4号线。',
+                        scheduleEn: 'Lives in North District HK, takes East Rail Line to Lok Ma Chau, crosses border to SZ Metro Line 4.',
+                        challenges: [
+                            '需适应内地"996"的工作文化和不同的职场潜规则。',
+                            '跨境数据访问受限，有时需用VPN连接香港服务。',
+                            '薪酬较香港有落差，但看重未来的晋升空间。'
+                        ],
+                        challengesEn: [
+                            'Need to adapt to Mainland "996" work culture and different workplace unspoken rules.',
+                            'Cross-border data access limited, sometimes need VPN to connect HK services.',
+                            'Salary gap compared to HK, but values future promotion space.'
+                        ],
+                        thoughts: '"深圳的创业环境比香港更灵活，年轻人有更多机会实现自己的想法。" - 李尊明，32岁',
+                        thoughtsEn: '"Shenzhen\'s startup environment is more flexible than HK, young people have more chances to realize their ideas." - Li Zunming, 32 years old'
+                    }
+                },
+                {
+                    id: 'consumer',
+                    icon: 'shopping-bag-open',
+                    title: '北上生活客',
+                    titleEn: 'Northbound Consumer',
+                    description: '从单纯的"消费北上"升级为"生活北上"，享受深圳的高性价比服务。',
+                    descriptionEn: 'Upgraded from "Consumption Northbound" to "Living Northbound", enjoying high cost-performance services in Shenzhen.',
+                    details: {
+                        motivation: '陈生每周末北上："深圳的餐饮、购物性价比极高。香港预约手术要排一年，深圳社康中心看病既快又便宜。"',
+                        motivationEn: 'Mr. Chen goes north every weekend: "Shenzhen dining and shopping are extremely cost-effective. HK surgery appointment takes a year, SZ community health center is fast and cheap."',
+                        schedule: '周末早上东铁线抵深，上午看牙/体检，中午吃酸菜鱼，下午山姆超市扫货，晚上按摩后返港。',
+                        scheduleEn: 'Weekend morning East Rail to SZ, dental/checkup in morning, Sauerkraut Fish for lunch, Sam\'s Club shopping in afternoon, massage then back to HK at night.',
+                        challenges: [
+                            '节假日口岸人流巨大，通关排队可能超2小时。',
+                            '需要熟练使用微信/支付宝、美团、滴滴等内地APP。',
+                            '热门餐厅需提前很久预约，"反向代购"需求大。'
+                        ],
+                        challengesEn: [
+                            'Huge crowd at port on holidays, crossing queue may exceed 2 hours.',
+                            'Need to be proficient in WeChat/Alipay, Meituan, Didi etc.',
+                            'Popular restaurants need advance reservation, high demand for "reverse purchasing".'
+                        ],
+                        thoughts: '"上次在深圳洗牙只花了100块，服务还好，在香港想都不敢想。" - 陈生，56岁',
+                        thoughtsEn: '"Last time teeth cleaning in SZ cost only 100 RMB with good service, unthinkable in HK." - Mr. Chen, 56 years old'
+                    }
+                }
+            ];
+
+            const profileList = document.getElementById('profile-list');
+            const detailView = document.getElementById('detail-view');
+            let activeCard = null;
+
+            function renderProfileList() {
+                // Clear existing content to prevent duplicates on re-render
+                profileList.innerHTML = '';
+                
+                commuterProfiles.forEach(profile => {
+                    const card = document.createElement('div');
+                    card.className = 'profile-card glass-card rounded-[20px] p-5 cursor-pointer flex items-center gap-4 border border-transparent hover:border-cyan-200 transition-all';
+                    card.dataset.id = profile.id;
+                    
+                    const isEn = lang === 'en';
+                    
+                    card.innerHTML = `
+                        <div class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center text-2xl shrink-0">
+                            <i class="ph-${profile.icon}"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base mb-1">${isEn ? (profile.titleEn || profile.title) : profile.title}</h3>
+                            <p class="text-xs text-slate-500 line-clamp-2">${isEn ? (profile.descriptionEn || profile.description) : profile.description}</p>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => {
+                        renderDetailView(profile.id);
+                        if (activeCard) activeCard.classList.remove('active');
+                        card.classList.add('active');
+                        activeCard = card;
+                    });
+                    
+                    // If this is the active card, keep it active
+                    if (activeCard && activeCard.dataset.id === profile.id) {
+                        card.classList.add('active');
+                        activeCard = card;
+                    }
+                    
+                    profileList.appendChild(card);
+                });
+            }
+
+            function renderDetailView(id) {
+                const profile = commuterProfiles.find(p => p.id === id);
+                if (!profile) return;
+
+                const isEn = lang === 'en';
+
+                detailView.innerHTML = `
+                    <div class="flex items-center gap-6 mb-8 pb-6 border-b border-slate-100">
+                        <div class="w-20 h-20 rounded-full bg-accent text-primary flex items-center justify-center text-4xl shrink-0 shadow-sm">
+                            <i class="ph-${profile.icon}"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">${isEn ? (profile.titleEn || profile.title) : profile.title}</h2>
+                            <p class="text-slate-500 text-sm">${isEn ? (profile.descriptionEn || profile.description) : profile.description}</p>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-xs font-bold text-primary uppercase tracking-widest mb-2">${isEn ? 'Motivation' : '主要动机'}</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">${isEn ? (profile.details.motivationEn || profile.details.motivation) : profile.details.motivation}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-primary uppercase tracking-widest mb-2">${isEn ? 'Commute Pattern' : '通勤模式'}</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">${isEn ? (profile.details.scheduleEn || profile.details.schedule) : profile.details.schedule}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-primary uppercase tracking-widest mb-2">${isEn ? 'Challenges' : '面临的挑战'}</h3>
+                            <ul class="list-disc pl-5 text-slate-600 text-sm space-y-1">
+                                ${(isEn ? (profile.details.challengesEn || profile.details.challenges) : profile.details.challenges).map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                        ${profile.details.thoughts ? `
+                        <div class="bg-cyan-50 p-4 rounded-xl border-l-4 border-primary mt-6">
+                            <p class="italic text-slate-700 font-serif text-sm">
+                                ${isEn ? (profile.details.thoughtsEn || profile.details.thoughts) : profile.details.thoughts}
+                            </p>
+                        </div>` : ''}
+                    </div>
+                `;
+            }
+
+            // Initial Render
+            if (profileList) {
+                renderProfileList();
+                if (commuterProfiles.length > 0) {
+                    renderDetailView(commuterProfiles[0].id);
+                    activeCard = profileList.querySelector('.profile-card');
+                    if (activeCard) activeCard.classList.add('active');
+                }
+            }
+
+            // --- DASHBOARD CHARTS (Re-init) ---
+            const { c1, c2, c3, c4, c5 } = {c1: '#0E7490', c2: '#06B6D4', c3: '#22D3EE'};
+
+            // 1. Transport Chart (Area)
+            const transportCtx = document.getElementById('transportChart')?.getContext('2d');
+            if (transportCtx) {
+                new Chart(transportCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['2010', '2012', '2014', '2016', '2018'],
+                        datasets: [
+                            { label: 'Road', data: [10, 15, 20, 25, 30], backgroundColor: c1, borderColor: c1, fill: 'start', tension: 0.4 },
+                            { label: 'Rail', data: [30, 35, 40, 45, 55], backgroundColor: c2, borderColor: c2, fill: '-1', tension: 0.4 },
+                            { label: 'HSR', data: [0, 0, 5, 15, 25], backgroundColor: c3, borderColor: c3, fill: '-1', tension: 0.4 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { stacked: true, display: false }, x: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono' } } } }, plugins: { legend: { display: false } } }
+                });
+            }
+
+            // 2. Age Chart (Bar)
+            const ageCtx = document.getElementById('ageChart')?.getContext('2d');
+            if (ageCtx) {
+                new Chart(ageCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['55+', '45-54', '35-44', '25-34', '18-24'],
+                        datasets: [{
+                            data: [15, 22, 38, 58, 42],
+                            backgroundColor: [c1, c1, c2, c2, c3],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono' } } } }, plugins: { legend: { display: false } } }
+                });
+            }
+
+            // 3. Income Chart (Bar)
+            const incomeCtx = document.getElementById('incomeChart')?.getContext('2d');
+            if (incomeCtx) {
+                new Chart(incomeCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['<10k', '10-20k', '20-40k', '40-60k', '>60k'],
+                        datasets: [{
+                            data: [35, 28, 20, 12, 5],
+                            backgroundColor: ['#CBD5E1', '#94A3B8', c3, c2, c1], // Gray to Cyan gradient
+                            borderRadius: 4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono' } } }, y: { display: false } }, plugins: { legend: { display: false } } }
+                });
+            }
+
+            // 4. Purpose Chart (Doughnut)
+            const purposeCtx = document.getElementById('purposeChart')?.getContext('2d');
+            if (purposeCtx) {
+                new Chart(purposeCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Work', 'Study', 'Family', 'Leisure', 'Medical'],
+                        datasets: [{
+                            data: [45, 18, 15, 12, 10],
+                            backgroundColor: [c1, c2, c3, '#6366F1', '#10B981'],
+                            borderColor: '#ffffff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+                });
+            }
+
+            // 5. Gender Chart (Line)
+            const genderCtx = document.getElementById('genderChart')?.getContext('2d');
+            if (genderCtx) {
+                new Chart(genderCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['2010', '2012', '2014', '2016', '2018'],
+                        datasets: [{
+                            data: [48, 49, 51, 52, 51.5],
+                            borderColor: c1,
+                            tension: 0.4,
+                            pointBackgroundColor: c1,
+                            pointRadius: 4,
+                            borderWidth: 3
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 45, max: 55, ticks: { callback: (value) => value + '%', font: { family: 'JetBrains Mono' } } }, x: { display: false } }, plugins: { legend: { display: false } } }
+                });
+            }
+
+            // Define global update function
+            updateContent = (l) => {
+                const isEn = l === 'en';
+                
+                // Re-render Timeline for language switch
+                if (typeof renderTimeline === 'function') {
+                    renderTimeline();
+                }
+
+                // Update Profile Section
+                if (typeof renderProfileList === 'function') {
+                    renderProfileList();
+                    if (activeCard) {
+                        renderDetailView(activeCard.dataset.id);
+                    } else if (commuterProfiles.length > 0) {
+                        renderDetailView(commuterProfiles[0].id);
+                    }
+                }
+            };
+
+            // Initial Render of Timeline
+            renderTimeline();
+        });
+    </script>
+</body>
+</html>

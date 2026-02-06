@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>跨境生活 - Cross-Boundary Living</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+      overflow: hidden;
+    }
+
+    /* Custom Scrollbar */
+    .scrollbar-thin::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: rgba(77, 182, 172, 0.3);
+      border-radius: 4px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+      background: rgba(77, 182, 172, 0.5);
+    }
+
+    /* Smooth Transitions */
+    .fade-enter {
+      opacity: 0;
+    }
+
+    .fade-enter-active {
+      opacity: 1;
+      transition: opacity 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .fade-exit {
+      opacity: 1;
+    }
+
+    .fade-exit-active {
+      opacity: 0;
+      transition: opacity 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Timeline Card Hover Effects */
+    .timeline-card {
+      position: relative;
+      transition: transform 300ms ease;
+    }
+
+    .timeline-card:hover {
+      transform: scale(1.05);
+    }
+
+    .timeline-card img {
+      transition: transform 500ms ease;
+    }
+
+    .timeline-card:hover img {
+      transform: scale(1.1);
+    }
+
+    .timeline-gradient-default {
+      background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent);
+      transition: opacity 300ms ease;
+    }
+
+    .timeline-card:hover .timeline-gradient-default {
+      opacity: 0;
+    }
+
+    .timeline-overlay-teal {
+      background: rgba(77, 182, 172, 0.9);
+      opacity: 0;
+      transition: opacity 300ms ease;
+    }
+
+    .timeline-card:hover .timeline-overlay-teal {
+      opacity: 1;
+    }
+
+    .timeline-card:hover .timeline-description {
+      max-height: 12rem;
+      opacity: 1;
+    }
+
+    /* Persona Card Hover */
+    .persona-card {
+      transition: transform 300ms ease, opacity 300ms ease;
+    }
+
+    .persona-card:hover {
+      transform: translateY(-4px);
+    }
+
+    /* Hide scrollbar for timeline */
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Loading placeholder for images */
+    .image-loading {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <style>
+    .nav-link { color: #64748b; position: relative; }
+    .nav-link.active, .nav-link:hover { color: #0E7490; }
+    .nav-link.active::after, .nav-link:hover::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #0E7490;
+      border-radius: 2px;
+    }
+    #contentSection .content-inner { padding-top: 6rem !important; }
+    body { animation: fadeInPage 0.8s ease-out; }
+    @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+
+  <script>
+    // Global language state
+    let lang = localStorage.getItem('lang') || 'en';
+  </script>
+  
+  <div id="app" class="min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#F0F9F9] to-white">
+    <!-- Navigation - Moved outside scrollable areas -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-2xl">
+      <div class="bg-white/70 backdrop-blur-md border border-slate-200/50 shadow-lg rounded-2xl px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+          <span class="text-xs font-bold tracking-widest text-slate-800 uppercase font-mono">NBSB Research</span>
+        </div>
+        <div class="flex gap-4 md:gap-8">
+          <a href="3-1.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-1"><span data-zh="跨时空分析" data-en="Cross-Temporal Analysis">跨时空分析</span></a>
+          <a href="3-2.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-2"><span data-zh="群像纪实" data-en="Persona">Persona</span></a>
+          <a href="3-3.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-timeline"><span data-zh="跨境时间线" data-en="Cross-Border Timeline">跨境时间线</span></a>
+          <a href="4-1future_question.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-future"><span data-zh="未来议题" data-en="Future Questions">未来议题</span></a>
+        </div>
+        <button id="lang-toggle" class="text-xs font-semibold px-3 py-1 rounded-lg border border-slate-200 text-slate-600 hover:text-primary">EN</button>
+        <button onclick="window.print()" class="hidden md:block text-slate-400 hover:text-slate-600">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Left Hero Section - Fixed -->
+    <div id="heroSection" class="fixed left-0 top-0 h-screen w-[35vw] hidden lg:block">
+      <img id="heroImage" src="" alt="Hero" class="w-full h-full object-cover fade-enter">
+    </div>
+
+    <!-- Right Content Section - Scrollable -->
+    <div id="contentSection" class="lg:ml-[35vw] ml-0 h-screen overflow-y-auto overflow-x-hidden">
+      <div class="content-inner max-w-[1024px] mx-auto px-8 py-12">
+        <!-- Navigation was here -->
+        
+        <!-- Mobile Hero Banner -->
+        <div class="lg:hidden mb-8 -mx-8 h-[40vh] relative">
+          <img id="mobileHeroImage" src="" alt="Mobile Hero" class="w-full h-full object-cover">
+        </div>
+
+        <!-- Persona Selector Cards -->
+        <div id="personaCards" class="grid grid-cols-4 gap-4 mb-12">
+          <!-- Cards will be generated by JavaScript -->
+        </div>
+
+        <!-- Main Content Container -->
+        <div id="mainContent">
+          <!-- Content will be generated by JavaScript -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // DATA LAYER
+    // ============================================
+    const ASSETS = {
+      hero: 'https://images.unsplash.com/photo-1519643381401-22c77e60520e?w=800',
+      avatar1: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
+      avatar2: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
+      avatar3: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200',
+      avatar4: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200',
+      timeline1: 'https://images.unsplash.com/photo-1506812574058-fc75fa93fead?w=400',
+      timeline2: 'https://images.unsplash.com/photo-1464207687429-7505649dae38?w=400',
+      timeline3: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400',
+      timeline4: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400',
+      timeline5: 'https://images.unsplash.com/photo-1531219432768-9f540ce91ef3?w=400',
+      timeline6: 'https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=400',
+      timeline7: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400',
+      timeline8: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400',
+      timeline9: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400'
+    };
+
+    const personasData = [
+      {
+        id: "leilei",
+        name: "leilei",
+        nameEn: "Lei",
+        age: 20,
+        role: "跨境学童",
+        roleEn: "Cross-border Student",
+        description: "深港通学，追求教育机会",
+        descriptionEn: "Cross-border student pursuing educational opportunities",
+        heroImage: "./images/imgLeiPortrait.png",
+        avatarImage: "./images/imgLeiCard.png",
+        avatarOverlay: null,
+        motivation: "从小在深圳长大的她，选择每天跨境到香港上学，是为了获得更国际化的教育资源。虽然通勤辛苦，但她认为这是投资未来最值得的选择。",
+        motivationEn: "Growing up in Shenzhen, she crosses daily to study in Hong Kong for more international resources. It’s exhausting, but she sees it as the best investment.",
+        adaptLiving: [
+          { zh: "早起已成习惯，6点起床对她来说是日常", en: "Waking at 6 a.m. is routine." },
+          { zh: "在通勤路上完成作业预习，充分利用每分钟", en: "She previews homework during the commute to use every minute." },
+          { zh: "周末会和同样跨境的朋友一起活动，互相支持", en: "Weekends with fellow cross-border friends offer mutual support." }
+        ],
+        challenges: [
+          { zh: "每天往返需要3小时，严重压缩了课外活动时间", en: "Three hours daily cut deeply into extracurricular time." },
+          { zh: "经常因口岸拥堵而迟到，影响出勤记录", en: "Border congestion often causes tardiness and attendance issues." },
+          { zh: "难以参与放学后的社团活动和同学聚会", en: "Hard to join after-school clubs or gatherings." }
+        ],
+        thoughts: [
+          { zh: "我羡慕住在香港的同学，他们放学后可以自由活动", en: "I envy classmates living in Hong Kong—they can hang out freely after class." },
+          { zh: "虽然很累，但想到能接受更好的教育就觉得值得", en: "It’s tiring, but better education makes it worth it." },
+          { zh: "希望未来口岸通关能更快一些", en: "Hope faster border clearance in the future." }
+        ],
+        timeline: [
+          { time: "6:00", title: "Wake Up", titleEn: "Wake Up", description: "闹钟响起，新的一天开始了", descriptionEn: "Alarm rings, a new day begins.", image: "./images/imgLeiTL (1).png" },
+          { time: "6:45", title: "Leave Home", titleEn: "Leave Home", description: "检查证件，出门前往口岸", descriptionEn: "Check ID, leave for the border.", image: "./images/imgLeiTL (2).png" },
+          { time: "7:30", title: "Border Crossing", titleEn: "Border Crossing", description: "排队过关，人潮拥挤", descriptionEn: "Queue for crossing, crowded.", image: "./images/imgLeiTL (3).png" },
+          { time: "8:30", title: "Arrive School", titleEn: "Arrive School", description: "终于到达学校，准备上课", descriptionEn: "Arrived at school, ready for class.", image: "./images/imgLeiTL (4).png" },
+          { time: "16:00", title: "After School", titleEn: "After School", description: "放学了，开始返程之路", descriptionEn: "School's out, start the journey back.", image: "./images/imgLeiTL (5).png" },
+          { time: "17:30", title: "On the Way Back", titleEn: "On the Way Back", description: "在地铁上完成作业", descriptionEn: "Finish homework on the subway.", image: "./images/imgLeiTL (6).png" },
+          { time: "18:30", title: "Return Home", titleEn: "Return Home", description: "终于回到家，可以休息了", descriptionEn: "Finally home, time to rest.", image: "./images/imgLeiTL (7).png" }
+        ]
+      },
+      {
+        id: "mrhu",
+        name: "胡先生",
+        nameEn: "Mr. Hu",
+        age: 35,
+        role: "跨境工作",
+        roleEn: "Cross-border Worker",
+        description: "港深双城生活，职场精英",
+        descriptionEn: "HK-SZ dual city life, corporate elite",
+        heroImage: "./images/imgHuPortrait.png",
+        avatarImage: "./images/imgHuCard.png",
+        avatarOverlay: null,
+        motivation: "在香港金融行业工作，但选择住在深圳以节省生活成本。深圳的房价相对合理，生活品质也不错，而香港的高薪能支撑更好的生活质量。",
+        motivationEn: "He works in HK finance but lives in Shenzhen to save costs—more space and good quality life, supported by HK salary.",
+        adaptLiving: [
+          { zh: "办理了多次往返签注，通关已经非常熟练", en: "Multiple-entry visas; clearance is smooth." },
+          { zh: "在深圳享受更宽敞的居住空间和更低的生活成本", en: "Enjoys larger space and lower costs in Shenzhen." },
+          { zh: "周末会在深圳和朋友聚会，享受内地的便利生活", en: "Weekends in Shenzhen with friends, enjoying convenience." }
+        ],
+        challenges: [
+          { zh: "每天通勤消耗大量时间和精力", en: "Commuting consumes much time and energy." },
+          { zh: "工作加班时无法及时回家，需要临时住宿", en: "Overtime sometimes forces temporary stays." },
+          { zh: "两地医疗和社保制度不同，就医不便", en: "Different systems make medical visits inconvenient." }
+        ],
+        thoughts: [
+          { zh: "跨境工作让我既能赚香港的薪水，又能享受深圳的生活", en: "Cross-border work earns HK pay with SZ lifestyle." },
+          { zh: "希望未来两地融合能更深入，减少通关障碍", en: "Hopes deeper integration and fewer barriers." },
+          { zh: "这种生活方式需要很强的时间管理能力", en: "This lifestyle demands strong time management." }
+        ],
+        timeline: [
+          { time: "7:00", title: "Morning Routine", titleEn: "Morning Routine", description: "准备出门上班", descriptionEn: "Getting ready for work.", image: "./images/imgHuTL (1).png" },
+          { time: "8:00", title: "Commute", titleEn: "Commute", description: "前往口岸", descriptionEn: "Heading to the border.", image: "./images/imgHuTL (2).png" },
+          { time: "9:00", title: "At Office", titleEn: "At Office", description: "开始一天的工作", descriptionEn: "Start the workday.", image: "./images/imgHuTL (3).png" },
+          { time: "12:30", title: "Lunch Break", titleEn: "Lunch Break", description: "午餐时间", descriptionEn: "Lunch break.", image: "./images/imgHuTL (4).png" },
+          { time: "18:00", title: "Evening Work", titleEn: "Evening Work", description: "处理收尾工作", descriptionEn: "Wrapping up work.", image: "./images/imgHuTL (5).png" },
+          { time: "19:30", title: "Head Home", titleEn: "Head Home", description: "下班返程", descriptionEn: "Heading back home.", image: "./images/imgHuTL (6).png" },
+          { time: "21:00", title: "Home Sweet Home", titleEn: "Home Sweet Home", description: "到家休息", descriptionEn: "Home and resting.", image: "./images/imgHuTL (7).png" }
+        ]
+      },
+      {
+        id: "zhang",
+        name: "Zhang",
+        nameEn: "Zhang",
+        age: 23,
+        role: "香港硕士",
+        roleEn: "Hong Kong Postgraduate",
+        description: "赴港深造，爱好逛街与演唱会",
+        descriptionEn: "Pursuing master's in HK, loves shopping and concerts",
+        heroImage: "./images/imgZhangPortrait.png",
+        avatarImage: "./images/imgZhangCard.png",
+        avatarOverlay: null,
+        motivation: "工作一年后来到香港深造。选择来到香港不仅是希望转行Marketing相关行业，同时香港的职场与日常生活对于女性更加友好。",
+        motivationEn: "After a year of work she pursues a master’s in Hong Kong, aiming to shift to marketing; HK’s workplace and daily life are friendlier to women.",
+        adaptLiving: [
+          { zh: "选课自由，自由时间多。为了能减少通勤开支，她会把课程集中到三天来上课，剩下的时间就可以实习或游乐。", en: "Flexible course selection; she clusters classes into three days to cut commute costs, leaving time for internships or leisure." },
+          { zh: "因为课程密集，中午不追求精致午餐，优先解决\"能睡一会儿\"的地点（图书馆角落/学生中心沙发/空教室）", en: "With dense classes, she prioritizes quick naps over fancy lunches—library corners, student center sofas, empty classrooms." }
+        ],
+        challenges: [
+          { zh: "早课=必须准点，任何口岸拥堵/交通延误都会让她整天节奏崩盘。", en: "Morning class requires punctuality; any border or transit delay ruins the day." },
+          { zh: "长期早起+跨境折返，午睡变成刚需；一累就很难保持课堂专注与产出。", en: "Early rising and crossing back and forth make naps essential; fatigue hurts focus and output." },
+          { zh: "由于也有不少人与她一样港读深居，因此社交上不会有过多障碍。但她与香港的生活文化依旧存在一层薄膜。", en: "Many also study in HK but live in SZ, so social life is fine; yet a thin film separates her from HK’s culture." }
+        ],
+        thoughts: [
+          { zh: "我不是不想参与同学的after class，我是真的回不去那么晚。而且深圳的饭菜和shopping环境不香吗哈哈", en: "It’s not that I don’t want to join after class—I just can’t get back that late. And isn’t Shenzhen’s food and shopping great?" },
+          { zh: "我最羡慕住港岛的同学：他们下课回家就能去海边city-walk，而我只有说下午没课的时候才能偶尔在香港街边种草散步玩耍", en: "I envy classmates on HK Island who can go seaside city-walking after class; I can only stroll in HK when I’m free in the afternoon." },
+          { zh: "幸好在香港还有我的姐妹居住，不然晚上听完演唱会很晚了就没地方住了。晚上的边境口岸并不是所有都会开放，凌晨的深港通勤难度还是很大很大的。", en: "Luckily my girlfriends live in HK; otherwise after late concerts I’d have nowhere to stay. Not all borders stay open at night; midnight SZ–HK commuting is truly hard." }
+        ],
+        timeline: [
+          { time: "6:55", title: "Departure", titleEn: "Departure", description: "她在闹钟声模糊醒来，在家里思索需要带什么东西出发去学校。证件，早餐出门前检查一遍。", descriptionEn: "Waking up to the alarm, thinking about what to bring. ID, breakfast—check before leaving.", image: "./images/imgZhangTL (1).png" },
+          { time: "7:30", title: "On the way", titleEn: "On the way", description: "深圳的清晨很安静，她在地铁上上默默吃早餐。香港的公交上不能进食任何食物", descriptionEn: "Shenzhen's morning is quiet; she eats breakfast silently on the metro. No eating allowed on HK buses.", image: "./images/imgZhangTL (2).png" },
+          { time: "7:55", title: "Arrived at Border", titleEn: "Arrived at Border", description: "人流变成一条线，她开始进入\"自动模式\"：刷证、走路、跟队。有些时候她会忘记带证件，这对他而言就是毁灭打击。", descriptionEn: "The crowd becomes a line; she enters 'auto mode': swipe ID, walk, follow. Sometimes she forgets her ID—a devastating blow.", image: "./images/imgZhangTL (3).png" },
+          { time: "8:10", title: "Metro Transfer", titleEn: "Metro Transfer", description: "早高峰的地铁人总是很多。但是上班前需要注意形象。跨境后的香港地铁通勤是最漫长的等待时间。今天她买了优先座，1想坐着慢慢恢复经历", descriptionEn: "Rush hour metro is crowded. Need to look good before work. The HK leg is the longest wait. Bought a priority seat today to recover energy.", image: "./images/imgZhangTL (4).png" },
+          { time: "9:15", title: "Arrive the company", titleEn: "Arrive the company", description: "进到学校校门的那一刻，她意识到快要上课了，她加快了脚步前往教室", descriptionEn: "Entering the school gate, realizing class is starting soon, she speeds up to the classroom.", image: "./images/imgZhangTL (5).png" },
+          { time: "12:00", title: "Group Work", titleEn: "Group Work", description: "为了减少通勤开支合理支配时间，她选了三堂课在一天同事上完，这也意味着今天她的小组讨论和课程很繁忙。她要坚持不睡午觉。", descriptionEn: "To save commute costs, she packs three classes into one day, meaning busy group discussions. She must resist napping.", image: "./images/imgZhangTL (6).png" },
+          { time: "19:25", title: "CityWalk Wander", titleEn: "CityWalk Wander", description: "下课后她并不着急回家。她想在香港再溜达犹豫一会，呼吸一下新鲜空气。于是用着为数不多的时间citywalk了一会.有时会兴奋忘记回家。", descriptionEn: "After class, she lingers in HK for fresh air, city-walking with her limited time. Sometimes she gets too excited and forgets to go home.", image: "./images/imgZhangTL (7).png" },
+          { time: "20:30", title: "Cross the Border", titleEn: "Cross the Border", description: "依旧是排队，刷卡，等待过境。手机信号往往在这里需要切换。幸好晚上过关速度快，毕竟人没有那么多了。", descriptionEn: "Queue, swipe, wait again. Phone signal switches here. Luckily, night crossing is faster with fewer people.", image: "./images/imgZhangTL (8).png" },
+          { time: "21:00", title: "Go back home", titleEn: "Go back home", description: "回到家一边吃外卖一边写作业", descriptionEn: "Back home, eating takeout while doing homework.", image: "./images/imgZhangTL (9).png" }
+        ]
+      },
+      {
+        id: "polin",
+        name: "Polin",
+        nameEn: "Polin",
+        age: 28,
+        role: "北上消费",
+        roleEn: "Northbound Consumer",
+        description: "香港居民，深圳购物达人",
+        descriptionEn: "Hong Kong resident, Shenzhen shopping expert",
+        heroImage: "./images/imgPolinPortrait.png",
+        avatarImage: "./images/imgPolinCard.png",
+        avatarOverlay: null,
+        motivation: "作为土生土长的香港人，她发现深圳的消费环境更丰富多样且价格实惠。从美食到购物，从美容到娱乐，深圳都提供了更多选择和性价比。",
+        motivationEn: "Born and raised in HK, she finds Shenzhen’s consumption richer and more affordable—from food and shopping to beauty and entertainment.",
+        adaptLiving: [
+          { zh: "周末必定北上，已经办理了深圳通等便利卡", en: "Northbound every weekend; holds Shenzhen travel cards." },
+          { zh: "熟悉深圳各大商圈，从罗湖到福田，从南山到前海", en: "Familiar with major SZ malls—from Luohu and Futian to Nanshan and Qianhai." },
+          { zh: "和朋友组团消费，分享折扣和优惠信息", en: "Shops with friends, sharing deals and discounts." }
+        ],
+        challenges: [
+          { zh: "需要合理安排时间，避免在口岸浪费太多通关时间", en: "Needs smart planning to avoid long border times." },
+          { zh: "携带大量购物品过关时需要注意海关规定", en: "Customs rules matter when carrying many goods." },
+          { zh: "有时会因为消费太尽兴而错过最后的过关时间", en: "Sometimes misses the last border closing after too much fun." }
+        ],
+        thoughts: [
+          { zh: "深圳的消费真的太香了！同样的价格能买到更多东西", en: "Shenzhen’s consumption is amazing—more for the same price." },
+          { zh: "每次北上都像是探险，总能发现新的好店和美食", en: "Every northbound trip is an adventure with new shops and foods." },
+          { zh: "希望通关能更便利，这样就能更频繁地来深圳了", en: "Hopes easier clearance for more frequent SZ trips." }
+        ],
+        timeline: [
+          { time: "10:00", title: "Start Journey", titleEn: "Start Journey", description: "周末早晨，准备北上消费", descriptionEn: "Weekend morning, ready to go north for shopping.", image: ASSETS.timeline1 },
+          { time: "11:00", title: "Arrive Shenzhen", titleEn: "Arrive Shenzhen", description: "顺利过关，开始购物之旅", descriptionEn: "Smooth crossing, start the shopping spree.", image: ASSETS.timeline2 },
+          { time: "12:30", title: "Lunch Time", titleEn: "Lunch Time", description: "品尝深圳美食", descriptionEn: "Tasting Shenzhen cuisine.", image: ASSETS.timeline3 },
+          { time: "14:00", title: "Shopping", titleEn: "Shopping", description: "商场扫货，买买买", descriptionEn: "Mall shopping, buy buy buy.", image: ASSETS.timeline4 },
+          { time: "16:30", title: "Beauty Treatment", titleEn: "Beauty Treatment", description: "享受美容服务", descriptionEn: "Enjoying beauty treatment.", image: ASSETS.timeline5 },
+          { time: "18:00", title: "Dinner", titleEn: "Dinner", description: "晚餐聚会", descriptionEn: "Dinner gathering.", image: ASSETS.timeline6 },
+          { time: "20:00", title: "Return Home", titleEn: "Return Home", description: "满载而归，准备回香港", descriptionEn: "Returning to HK with a full load.", image: ASSETS.timeline7 }
+        ]
+      }
+    ];
+
+    // ============================================
+    // STATE MANAGEMENT
+    // ============================================
+    let currentPersona = personasData[2]; // Zhang as default
+    let scrollY = 0;
+    let activeTimelineIndex = 0;
+
+    // ============================================
+    // DOM ELEMENTS
+    // ============================================
+    const heroImage = document.getElementById('heroImage');
+    const mobileHeroImage = document.getElementById('mobileHeroImage');
+    const contentSection = document.getElementById('contentSection');
+    const personaCards = document.getElementById('personaCards');
+    const mainContent = document.getElementById('mainContent');
+
+    // ============================================
+    // RENDER FUNCTIONS
+    // ============================================
+    
+    function renderPersonaCards() {
+      personaCards.innerHTML = personasData.map(persona => `
+        <button
+          data-persona-id="${persona.id}"
+          class="persona-card relative rounded-[20px] p-4 flex flex-col items-center gap-3 transition-all duration-300 backdrop-blur-[10px] ${
+            currentPersona.id === persona.id
+              ? 'bg-white/80 ring-2 ring-[#4DB6AC] shadow-[0_8px_32px_rgba(77,182,172,0.3)]'
+              : 'bg-white/60 opacity-60 hover:opacity-80 shadow-[0_4px_16px_rgba(184,214,214,0.2)]'
+          }"
+        >
+          <div class="relative w-16 h-16 rounded-full overflow-hidden shrink-0">
+            <img src="${persona.avatarImage}" alt="${lang==='en' ? (persona.nameEn || persona.name) : persona.name}" class="w-full h-full object-cover" />
+          </div>
+          <div class="text-center">
+            <p class="font-bold text-[#2C3E50] text-sm">${lang==='en' ? (persona.nameEn || persona.name) : persona.name}</p>
+            <p class="text-xs text-[#546E7A]">${lang==='en' ? (persona.roleEn || persona.role) : persona.role}</p>
+          </div>
+        </button>
+      `).join('');
+
+      // Add click handlers
+      document.querySelectorAll('[data-persona-id]').forEach(card => {
+        card.addEventListener('click', () => {
+          const personaId = card.getAttribute('data-persona-id');
+          const persona = personasData.find(p => p.id === personaId);
+          if (persona) {
+            changePersona(persona);
+          }
+        });
+      });
+    }
+
+    function renderMainContent(persona) {
+      if (!persona) return;
+      
+      const isEn = lang === 'en';
+      
+      mainContent.innerHTML = `
+        <div class="fade-enter-active">
+          <!-- Persona Header -->
+          <div class="mb-8">
+            <div class="flex items-baseline gap-4 mb-2">
+              <h1 class="text-5xl font-extrabold text-[#4DB6AC]">${isEn ? (persona.nameEn || persona.name) : persona.name}</h1>
+              <span class="text-xl text-[#2C3E50] font-semibold">Age: ${persona.age}</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="px-3 py-1 bg-[#4DB6AC] text-white text-sm rounded-full">
+                ${isEn ? (persona.roleEn || persona.role) : persona.role}
+              </span>
+              <p class="text-[#546E7A] text-sm">${isEn ? (persona.descriptionEn || persona.description) : persona.description}</p>
+            </div>
+          </div>
+
+          <!-- Main Info Grid -->
+          <div class="grid lg:grid-cols-[2fr_1fr] gap-8 mb-12">
+            <!-- Left: Motivation & Adapt -->
+            <div class="rounded-[20px] bg-white/80 backdrop-blur-[12px] p-8 shadow-[0_8px_32px_rgba(184,214,214,0.3)]">
+              <div class="mb-6">
+                <h3 class="text-xl font-bold text-[#2C3E50] mb-3">Motivation</h3>
+                <p class="text-[#546E7A] leading-relaxed">${isEn ? (persona.motivationEn || persona.motivation) : persona.motivation}</p>
+              </div>
+
+              <div class="h-px bg-gradient-to-r from-[#4DB6AC] to-transparent mb-6"></div>
+
+              <div>
+                <h3 class="text-xl font-bold text-[#2C3E50] mb-3">Adapt to Living</h3>
+                <div class="space-y-3">
+                  ${persona.adaptLiving.map(item => `
+                    <div class="flex gap-3">
+                      <div class="w-2 h-2 rounded-full bg-[#4DB6AC] mt-2 shrink-0"></div>
+                      <p class="text-[#546E7A] leading-relaxed">${isEn ? item.en : item.zh}</p>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div class="h-px bg-gradient-to-r from-[#4DB6AC] to-transparent my-6"></div>
+
+              <div>
+                <h3 class="text-xl font-bold text-[#2C3E50] mb-3">Facing Challenges</h3>
+                <div class="space-y-4">
+                  ${persona.challenges.map(challenge => `
+                    <div class="p-4 bg-white/60 backdrop-blur-[8px] rounded-[16px] border border-[#4DB6AC]/20 shadow-[0_4px_16px_rgba(77,182,172,0.1)]">
+                      <p class="text-[#546E7A] text-sm leading-relaxed">${isEn ? challenge.en : challenge.zh}</p>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Thoughts with Parallax -->
+            <div class="space-y-4">
+              <h3 class="text-xl font-bold text-[#2C3E50] mb-4 flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-[#4DB6AC]/20 flex items-center justify-center">
+                  💭
+                </span>
+                Thoughts
+              </h3>
+              ${persona.thoughts.map((thought, idx) => `
+                <div 
+                  class="thought-bubble p-5 bg-white/70 backdrop-blur-[12px] rounded-[20px] shadow-[0_8px_24px_rgba(184,214,214,0.25)] border border-[#4DB6AC]/10"
+                  data-parallax-speed="${0.05 + idx * 0.03}"
+                >
+                  <p class="text-[#546E7A] text-sm leading-relaxed italic">"${isEn ? thought.en : thought.zh}"</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Daily Timeline Section -->
+          <div class="mb-8">
+            <h2 class="text-2xl font-extrabold text-[#2C3E50] mb-4 flex items-center gap-3">
+              <span class="w-10 h-10 rounded-full bg-[#4DB6AC] flex items-center justify-center text-white text-xl">
+                📅
+              </span>
+              <span data-zh="跨境一日生活" data-en="Daily Cross-Border Living">跨境一日生活</span>
+            </h2>
+            <p class="text-xs text-[#4DB6AC] mb-4"><span data-zh="滚动查看一日完整作息 →" data-en="Scroll to view a full day →">滚动查看一日完整作息 →</span></p>
+
+            <!-- Timeline Container -->
+            <div id="timelineContainer" class="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+              ${persona.timeline.map((item, idx) => `
+                <div class="timeline-card relative shrink-0 w-[280px] h-[360px] rounded-[20px] overflow-hidden cursor-pointer shadow-[0_8px_32px_rgba(184,214,214,0.3)]">
+                  <!-- Background Image -->
+                  <img
+                    src="${item.image}"
+                    alt="${isEn ? item.titleEn : item.title}"
+                    class="absolute inset-0 w-full h-full object-cover"
+                  />
+
+                  <!-- Gradient Overlay - Default -->
+                  <div class="timeline-gradient-default absolute inset-0"></div>
+
+                  <!-- Teal Overlay - Show on hover -->
+                  <div class="timeline-overlay-teal absolute inset-0"></div>
+
+                  <!-- Content -->
+                  <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <div class="text-3xl font-bold mb-2 transition-all duration-300">${item.time}</div>
+                    <div class="text-xl font-semibold mb-2 transition-all duration-300">${isEn ? item.titleEn : item.title}</div>
+                    
+                    <!-- Description - Show on hover -->
+                    <div class="timeline-description max-h-0 opacity-0 overflow-hidden text-sm leading-relaxed transition-all duration-500 ease-in-out">${isEn ? item.descriptionEn : item.description}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Dot Navigation -->
+            <div class="flex justify-center items-center gap-2 mt-6">
+              ${persona.timeline.map((_, idx) => `
+                <button
+                  class="dot-nav transition-all duration-300 rounded-full ${
+                    activeTimelineIndex === idx
+                      ? 'w-8 h-2 bg-[#4DB6AC]'
+                      : 'w-2 h-2 bg-[#4DB6AC] opacity-30 hover:opacity-60'
+                  }"
+                  data-timeline-index="${idx}"
+                  aria-label="跳转到第${idx + 1}个时间点"
+                ></button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Setup timeline horizontal scroll
+      setupTimelineScroll();
+      
+      // Setup dot navigation
+      setupDotNavigation();
+    }
+
+    function updateHeroImage(persona) {
+      if (!persona) return;
+      const newImage = new Image();
+      newImage.src = persona.heroImage;
+      newImage.onload = () => {
+        if (heroImage) {
+          heroImage.classList.remove('fade-enter-active');
+          heroImage.classList.add('fade-exit-active');
+          
+          setTimeout(() => {
+            heroImage.src = persona.heroImage;
+            heroImage.classList.remove('fade-exit-active');
+            heroImage.classList.add('fade-enter-active');
+          }, 500);
+        }
+      };
+
+      // Mobile hero
+      if (mobileHeroImage) mobileHeroImage.src = persona.heroImage;
+    }
+
+    function changePersona(persona) {
+      currentPersona = persona;
+      activeTimelineIndex = 0;
+      
+      // Update hero image with fade effect
+      updateHeroImage(persona);
+      
+      // Re-render cards and content
+      renderPersonaCards();
+      renderMainContent(persona);
+      
+      // Reset scroll position
+      if (contentSection) {
+        contentSection.scrollTo({ top: 0, behavior: 'smooth' });
+        scrollY = 0;
+      }
+      
+      // Reset timeline scroll
+      const timelineContainer = document.getElementById('timelineContainer');
+      if (timelineContainer) {
+        timelineContainer.scrollTo({ left: 0, behavior: 'smooth' });
+      }
+    }
+
+    // ============================================
+    // SCROLL & PARALLAX EFFECTS
+    // ============================================
+    
+    function setupScrollParallax() {
+      if (!contentSection) return;
+      contentSection.addEventListener('scroll', () => {
+        scrollY = contentSection.scrollTop;
+        
+        // Apply parallax to thought bubbles
+        document.querySelectorAll('.thought-bubble').forEach(bubble => {
+          const speed = parseFloat(bubble.getAttribute('data-parallax-speed'));
+          const yOffset = -scrollY * speed;
+          bubble.style.transform = `translateY(${yOffset}px)`;
+        });
+      });
+    }
+
+    function setupTimelineScroll() {
+      const timelineContainer = document.getElementById('timelineContainer');
+      if (!timelineContainer) return;
+
+      // Wheel event for horizontal scrolling
+      timelineContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        timelineContainer.scrollLeft += e.deltaY;
+      }, { passive: false });
+
+      // Scroll event to update active dot
+      timelineContainer.addEventListener('scroll', () => {
+        const scrollLeft = timelineContainer.scrollLeft;
+        const cardWidth = 280 + 24; // card width + gap
+        const newIndex = Math.round(scrollLeft / cardWidth);
+        
+        if (newIndex !== activeTimelineIndex) {
+          activeTimelineIndex = newIndex;
+          updateDotNavigation();
+        }
+      });
+    }
+
+    function setupDotNavigation() {
+      const dots = document.querySelectorAll('.dot-nav');
+      dots.forEach(dot => {
+        dot.addEventListener('click', () => {
+          const index = parseInt(dot.getAttribute('data-timeline-index'));
+          scrollToTimelineItem(index);
+        });
+      });
+    }
+
+    function scrollToTimelineItem(index) {
+      const timelineContainer = document.getElementById('timelineContainer');
+      if (!timelineContainer) return;
+
+      const cardWidth = 280 + 24; // card width + gap
+      const scrollLeft = index * cardWidth;
+      timelineContainer.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+      activeTimelineIndex = index;
+      updateDotNavigation();
+    }
+
+    function updateDotNavigation() {
+      const dots = document.querySelectorAll('.dot-nav');
+      dots.forEach((dot, idx) => {
+        if (idx === activeTimelineIndex) {
+          dot.className = 'dot-nav transition-all duration-300 rounded-full w-8 h-2 bg-[#4DB6AC]';
+        } else {
+          dot.className = 'dot-nav transition-all duration-300 rounded-full w-2 h-2 bg-[#4DB6AC] opacity-30 hover:opacity-60';
+        }
+      });
+    }
+
+    function applyLang(l) {
+      // Update static text elements
+      document.querySelectorAll('[data-zh]').forEach(el => {
+        const txt = el.getAttribute(l === 'zh' ? 'data-zh' : 'data-en');
+        if (txt) el.textContent = txt;
+      });
+      
+      // Update HTML lang attribute
+      document.documentElement.lang = l === 'zh' ? 'zh-CN' : 'en';
+      
+      // Update toggle button text
+      const btn = document.getElementById('lang-toggle');
+      if (btn) btn.textContent = l === 'zh' ? 'EN' : '中文';
+      
+      // Re-render dynamic content
+      renderPersonaCards();
+      renderMainContent(currentPersona);
+    }
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    
+    function init() {
+      // Handle Navigation Active State
+      const currentFile = window.location.pathname.split("/").pop();
+      if (currentFile.includes("3-1") || currentFile === "") {
+        const el = document.getElementById('nav-3-1'); if(el) el.classList.add('active');
+      } else if (currentFile.includes("3-2")) {
+        const el = document.getElementById('nav-3-2'); if(el) el.classList.add('active');
+      } else if (currentFile.includes("3-3") || currentFile.includes("timeline")) {
+        const el = document.getElementById('nav-timeline'); if(el) el.classList.add('active');
+      } else if (currentFile.includes("4-1") || currentFile.includes("future")) {
+        const el = document.getElementById('nav-future'); if(el) el.classList.add('active');
+      }
+
+      // Handle Language Toggle
+      const toggle = document.getElementById('lang-toggle');
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          lang = lang === 'zh' ? 'en' : 'zh';
+          localStorage.setItem('lang', lang);
+          applyLang(lang);
+        });
+      }
+
+      // Initial render
+      applyLang(lang);
+      updateHeroImage(currentPersona);
+      
+      // Setup scroll effects
+      setupScrollParallax();
+    }
+
+    // Start the app when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+
+</body>
+</html>
