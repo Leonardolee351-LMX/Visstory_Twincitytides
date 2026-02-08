@@ -7,6 +7,19 @@
   
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0E7490', // Cyan 700
+            secondary: '#06B6D4', // Cyan 500
+            slate: { 850: '#1e293b' }
+          }
+        }
+      }
+    }
+  </script>
   
   <style>
     * {
@@ -134,22 +147,69 @@
 <body>
 
   <style>
-    .nav-link { color: #64748b; position: relative; }
-    .nav-link.active, .nav-link:hover { color: #0E7490; }
-    .nav-link.active::after, .nav-link:hover::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: #0E7490;
-      border-radius: 2px;
-    }
-    #contentSection .content-inner { padding-top: 6rem !important; }
-    body { animation: fadeInPage 0.8s ease-out; }
-    @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  </style>
+        .nav-link { color: #64748b; position: relative; }
+        .nav-link.active, .nav-link:hover { color: #0E7490; }
+        .nav-link.active::after, .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #0E7490;
+            border-radius: 2px;
+        }
+        #contentSection .content-inner { padding-top: 6rem !important; }
+        body { animation: fadeInPage 0.8s ease-out; }
+        @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CHAPTER NAVIGATOR (CAPSULE) --- */
+        .chapter-nav-container {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 4px;
+            border-radius: 100px;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-btn {
+            border: none;
+            background: transparent;
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .nav-btn.active {
+            background: #0f172a;
+            color: white;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.15);
+        }
+
+        .nav-btn:hover:not(.active) {
+            background: rgba(0,0,0,0.04);
+            color: #0f172a;
+        }
+    </style>
 
   <script>
     // Global language state
@@ -157,26 +217,6 @@
   </script>
   
   <div id="app" class="min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#F0F9F9] to-white">
-    <!-- Navigation - Moved outside scrollable areas -->
-    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-2xl">
-      <div class="bg-white/70 backdrop-blur-md border border-slate-200/50 shadow-lg rounded-2xl px-6 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
-          <span class="text-xs font-bold tracking-widest text-slate-800 uppercase font-mono">NBSB Research</span>
-        </div>
-        <div class="flex gap-4 md:gap-8">
-          <a href="3-1.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-1"><span data-zh="跨时空分析" data-en="Cross-Temporal Analysis">跨时空分析</span></a>
-          <a href="3-2.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-2"><span data-zh="群像纪实" data-en="Persona">Persona</span></a>
-          <a href="3-3.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-timeline"><span data-zh="跨境时间线" data-en="Cross-Border Timeline">跨境时间线</span></a>
-          <a href="4-1future_question.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-future"><span data-zh="未来议题" data-en="Future Questions">未来议题</span></a>
-        </div>
-        <button id="lang-toggle" class="text-xs font-semibold px-3 py-1 rounded-lg border border-slate-200 text-slate-600 hover:text-primary">EN</button>
-        <button onclick="window.print()" class="hidden md:block text-slate-400 hover:text-slate-600">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-        </button>
-      </div>
-    </nav>
-
     <!-- Left Hero Section - Fixed -->
     <div id="heroSection" class="fixed left-0 top-0 h-screen w-[35vw] hidden lg:block">
       <img id="heroImage" src="" alt="Hero" class="w-full h-full object-cover fade-enter">
@@ -185,7 +225,12 @@
     <!-- Right Content Section - Scrollable -->
     <div id="contentSection" class="lg:ml-[35vw] ml-0 h-screen overflow-y-auto overflow-x-hidden">
       <div class="content-inner max-w-[1024px] mx-auto px-8 py-12">
-        <!-- Navigation was here -->
+        <!-- Chapter Navigation -->
+        <div class="chapter-nav-container">
+            <a href="3-2.html" class="nav-btn active">3.1 Persona</a>
+            <a href="3-3.html" class="nav-btn">3.2 Timeline</a>
+            <a href="3-3fix.html" class="nav-btn">3.3 Phenomenon</a>
+        </div>
         
         <!-- Mobile Hero Banner -->
         <div class="lg:hidden mb-8 -mx-8 h-[40vh] relative">
@@ -211,99 +256,113 @@
     // DATA LAYER
     // ============================================
     const ASSETS = {
-      hero: 'https://images.unsplash.com/photo-1519643381401-22c77e60520e?w=800',
-      avatar1: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
-      avatar2: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
-      avatar3: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200',
-      avatar4: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200',
-      timeline1: 'https://images.unsplash.com/photo-1506812574058-fc75fa93fead?w=400',
-      timeline2: 'https://images.unsplash.com/photo-1464207687429-7505649dae38?w=400',
-      timeline3: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400',
-      timeline4: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400',
-      timeline5: 'https://images.unsplash.com/photo-1531219432768-9f540ce91ef3?w=400',
-      timeline6: 'https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=400',
-      timeline7: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400',
-      timeline8: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400',
-      timeline9: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400'
+      hero: 'images/The Reopening.jpg',
+      avatar1: 'images/imgLeiCard.png',
+      avatar2: 'images/imgHuCard.png',
+      avatar3: 'images/imgZhangCard.png',
+      avatar4: 'images/imgPolinCard.png',
+      timeline1: 'images/The Hard Border.jpg',
+      timeline2: 'images/The Blueprint.jpg',
+      timeline3: 'images/Infrastructure Leap.jpg',
+      timeline4: 'images/GBA Strategy.jpg',
+      timeline5: 'images/The Freeze.jpg',
+      timeline6: 'images/Digital Integration.jpg',
+      timeline7: 'images/Transport Links.jpg',
+      timeline8: 'images/Living Circle.jpg',
+      timeline9: 'images/Future Fusion.jpg'
     };
 
     const personasData = [
       {
         id: "leilei",
-        name: "leilei",
+        name: "Lei",
         nameEn: "Lei",
-        age: 20,
-        role: "跨境学童",
+        age: 12,
+        role: "Cross-border Student",
         roleEn: "Cross-border Student",
-        description: "深港通学，追求教育机会",
-        descriptionEn: "Cross-border student pursuing educational opportunities",
+        description: "Commuting between SZ and HK for education",
+        descriptionEn: "Commuting between SZ and HK for education",
         heroImage: "./images/imgLeiPortrait.png",
         avatarImage: "./images/imgLeiCard.png",
         avatarOverlay: null,
-        motivation: "从小在深圳长大的她，选择每天跨境到香港上学，是为了获得更国际化的教育资源。虽然通勤辛苦，但她认为这是投资未来最值得的选择。",
-        motivationEn: "Growing up in Shenzhen, she crosses daily to study in Hong Kong for more international resources. It’s exhausting, but she sees it as the best investment.",
+        motivation: "Growing up in Shenzhen, she crosses the border daily to attend school in Hong Kong, seeking broader international educational opportunities. Though the commute is exhausting, she views it as a worthwhile investment in her future.",
+        motivationEn: "Growing up in Shenzhen, she crosses the border daily to attend school in Hong Kong, seeking broader international educational opportunities. Though the commute is exhausting, she views it as a worthwhile investment in her future.",
         adaptLiving: [
-          { zh: "早起已成习惯，6点起床对她来说是日常", en: "Waking at 6 a.m. is routine." },
-          { zh: "在通勤路上完成作业预习，充分利用每分钟", en: "She previews homework during the commute to use every minute." },
-          { zh: "周末会和同样跨境的朋友一起活动，互相支持", en: "Weekends with fellow cross-border friends offer mutual support." }
+          { zh: "早起已成习惯，6点起床对她来说是日常", en: "Waking up at 6:00 AM has become her daily routine, a discipline forged by necessity." },
+          { zh: "在通勤路上完成作业预习，充分利用每分钟", en: "She masters time management, using the commute to preview lessons and finish homework." },
+          { zh: "周末会和同样跨境的朋友一起活动，互相支持", en: "Weekends are spent with fellow cross-border students, forming a supportive community." }
         ],
         challenges: [
-          { zh: "每天往返需要3小时，严重压缩了课外活动时间", en: "Three hours daily cut deeply into extracurricular time." },
-          { zh: "经常因口岸拥堵而迟到，影响出勤记录", en: "Border congestion often causes tardiness and attendance issues." },
-          { zh: "难以参与放学后的社团活动和同学聚会", en: "Hard to join after-school clubs or gatherings." }
+          { zh: "每天往返需要3小时，严重压缩了课外活动时间", en: "The 3-hour daily round trip severely squeezes her time for extracurricular activities." },
+          { zh: "经常因口岸拥堵而迟到，影响出勤记录", en: "Unpredictable border congestion often leads to tardiness, impacting her attendance record." },
+          { zh: "难以参与放学后的社团活动和同学聚会", en: "It's hard to join after-school clubs or hang out with classmates who live in HK." }
         ],
         thoughts: [
-          { zh: "我羡慕住在香港的同学，他们放学后可以自由活动", en: "I envy classmates living in Hong Kong—they can hang out freely after class." },
-          { zh: "虽然很累，但想到能接受更好的教育就觉得值得", en: "It’s tiring, but better education makes it worth it." },
-          { zh: "希望未来口岸通关能更快一些", en: "Hope faster border clearance in the future." }
+          { zh: "我羡慕住在香港的同学，他们放学后可以自由活动", en: "I sometimes envy my HK classmates; they have so much freedom after school." },
+          { zh: "虽然很累，但想到能接受更好的教育就觉得值得", en: "It's tiring, but when I think about the education I'm getting, I know it's worth it." },
+          { zh: "希望未来口岸通关能更快一些", en: "I just wish the border crossing could be a little faster and less stressful." }
         ],
+        opinion: {
+          title: "About the Border",
+          titleEn: "About the Border",
+          content: "The Shenzhen-Hong Kong border is like a magic door to me. One side holds the delicious warmth of home cooking; the other, the strict discipline of school. I wish this door could remain open forever, without the long queues and barriers.",
+          contentEn: "The Shenzhen-Hong Kong border is like a magic door to me. One side holds the delicious warmth of home cooking; the other, the strict discipline of school. I wish this door could remain open forever, without the long queues and barriers."
+        },
         timeline: [
-          { time: "6:00", title: "Wake Up", titleEn: "Wake Up", description: "闹钟响起，新的一天开始了", descriptionEn: "Alarm rings, a new day begins.", image: "./images/imgLeiTL (1).png" },
-          { time: "6:45", title: "Leave Home", titleEn: "Leave Home", description: "检查证件，出门前往口岸", descriptionEn: "Check ID, leave for the border.", image: "./images/imgLeiTL (2).png" },
-          { time: "7:30", title: "Border Crossing", titleEn: "Border Crossing", description: "排队过关，人潮拥挤", descriptionEn: "Queue for crossing, crowded.", image: "./images/imgLeiTL (3).png" },
-          { time: "8:30", title: "Arrive School", titleEn: "Arrive School", description: "终于到达学校，准备上课", descriptionEn: "Arrived at school, ready for class.", image: "./images/imgLeiTL (4).png" },
-          { time: "16:00", title: "After School", titleEn: "After School", description: "放学了，开始返程之路", descriptionEn: "School's out, start the journey back.", image: "./images/imgLeiTL (5).png" },
-          { time: "17:30", title: "On the Way Back", titleEn: "On the Way Back", description: "在地铁上完成作业", descriptionEn: "Finish homework on the subway.", image: "./images/imgLeiTL (6).png" },
-          { time: "18:30", title: "Return Home", titleEn: "Return Home", description: "终于回到家，可以休息了", descriptionEn: "Finally home, time to rest.", image: "./images/imgLeiTL (7).png" }
+          { time: "6:00", title: "Wake Up", titleEn: "Wake Up", description: "The alarm rings. I'm dragged out of bed to change into my uniform while Shenzhen's sky is still waking up.", descriptionEn: "The alarm rings. I'm dragged out of bed to change into my uniform while Shenzhen's sky is still waking up.", image: "./images/imgLeiTL (1).png" },
+          { time: "6:45", title: "Leave Home", titleEn: "Leave Home", description: "Leaving home with a heavy backpack. Mom stuffs a warm breakfast into my hand, her daily reminder to be safe echoing.", descriptionEn: "Leaving home with a heavy backpack. Mom stuffs a warm breakfast into my hand, her daily reminder to be safe echoing.", image: "./images/imgLeiTL (2).png" },
+          { time: "7:30", title: "Border Crossing", titleEn: "Border Crossing", description: "I join the army of uniforms at the border. We are all the same here, expert travelers swiping cards to cross the line.", descriptionEn: "I join the army of uniforms at the border. We are all the same here, expert travelers swiping cards to cross the line.", image: "./images/imgLeiTL (3).png" },
+          { time: "8:30", title: "Arrive School", titleEn: "Arrive School", description: "Boarding the HK school bus, I finally reach school. I managed a quick nap on the bus, recharging just enough.", descriptionEn: "Boarding the HK school bus, I finally reach school. I managed a quick nap on the bus, recharging just enough.", image: "./images/imgLeiTL (4).png" },
+          { time: "15:00", title: "After School", titleEn: "After School", description: "The bell rings. While others head to the playground, I sprint to catch the cross-border bus. Missing it means not getting home.", descriptionEn: "The bell rings. While others head to the playground, I sprint to catch the cross-border bus. Missing it means not getting home.", image: "./images/imgLeiTL (5).png" },
+          { time: "17:30", title: "On the Way Back", titleEn: "On the Way Back", description: "Queuing at the border again. I take out my vocab book. The noise around me fades as I focus on my words.", descriptionEn: "Queuing at the border again. I take out my vocab book. The noise around me fades as I focus on my words.", image: "./images/imgLeiTL (6).png" },
+          { time: "18:30", title: "Return Home", titleEn: "Return Home", description: "Back in Shenzhen. The smell of dinner welcomes me. I eat, then it's straight back to homework until late.", descriptionEn: "Back in Shenzhen. The smell of dinner welcomes me. I eat, then it's straight back to homework until late.", image: "./images/imgLeiTL (7).png" },
+          { time: "21:00", title: "Bedtime", titleEn: "Bedtime", description: "Finally, sleep. My eyes close, knowing the 6 AM alarm is already ticking closer.", descriptionEn: "Finally, sleep. My eyes close, knowing the 6 AM alarm is already ticking closer.", image: "./images/imgLeiTL (8).png" }
         ]
       },
       {
         id: "mrhu",
-        name: "胡先生",
+        name: "Mr. Hu",
         nameEn: "Mr. Hu",
         age: 35,
-        role: "跨境工作",
+        role: "Cross-border Worker",
         roleEn: "Cross-border Worker",
-        description: "港深双城生活，职场精英",
+        description: "HK-SZ dual city life, corporate elite",
         descriptionEn: "HK-SZ dual city life, corporate elite",
         heroImage: "./images/imgHuPortrait.png",
         avatarImage: "./images/imgHuCard.png",
         avatarOverlay: null,
-        motivation: "在香港金融行业工作，但选择住在深圳以节省生活成本。深圳的房价相对合理，生活品质也不错，而香港的高薪能支撑更好的生活质量。",
-        motivationEn: "He works in HK finance but lives in Shenzhen to save costs—more space and good quality life, supported by HK salary.",
+        motivation: "He works in HK finance but lives in Shenzhen. It's a strategic choice: Shenzhen offers spacious living and a high quality of life at a reasonable cost, while his Hong Kong salary supports it all.",
+        motivationEn: "He works in HK finance but lives in Shenzhen. It's a strategic choice: Shenzhen offers spacious living and a high quality of life at a reasonable cost, while his Hong Kong salary supports it all.",
         adaptLiving: [
-          { zh: "办理了多次往返签注，通关已经非常熟练", en: "Multiple-entry visas; clearance is smooth." },
-          { zh: "在深圳享受更宽敞的居住空间和更低的生活成本", en: "Enjoys larger space and lower costs in Shenzhen." },
-          { zh: "周末会在深圳和朋友聚会，享受内地的便利生活", en: "Weekends in Shenzhen with friends, enjoying convenience." }
+          { zh: "办理了多次往返签注，通关已经非常熟练", en: "With his multiple-entry visa, border clearance has become second nature, a seamless part of his day." },
+          { zh: "在深圳享受更宽敞的居住空间和更低的生活成本", en: "He enjoys a spacious apartment in Shenzhen, a luxury that would be unaffordable in Central HK." },
+          { zh: "周末会在深圳和朋友聚会，享受内地的便利生活", en: "Weekends are for Shenzhen: friends, food delivery, and the convenience of mainland digital life." }
         ],
         challenges: [
-          { zh: "每天通勤消耗大量时间和精力", en: "Commuting consumes much time and energy." },
-          { zh: "工作加班时无法及时回家，需要临时住宿", en: "Overtime sometimes forces temporary stays." },
-          { zh: "两地医疗和社保制度不同，就医不便", en: "Different systems make medical visits inconvenient." }
+          { zh: "每天通勤消耗大量时间和精力", en: "The daily commute is a significant drain on time and energy, requiring strict discipline." },
+          { zh: "工作加班时无法及时回家，需要临时住宿", en: "Late overtime means missing the border closing, sometimes forcing unplanned stays in HK." },
+          { zh: "两地医疗和社保制度不同，就医不便", en: "Navigating two different medical and social security systems can be a bureaucratic headache." }
         ],
         thoughts: [
-          { zh: "跨境工作让我既能赚香港的薪水，又能享受深圳的生活", en: "Cross-border work earns HK pay with SZ lifestyle." },
-          { zh: "希望未来两地融合能更深入，减少通关障碍", en: "Hopes deeper integration and fewer barriers." },
-          { zh: "这种生活方式需要很强的时间管理能力", en: "This lifestyle demands strong time management." }
+          { zh: "跨境工作让我既能赚香港的薪水，又能享受深圳的生活", en: "Cross-border work is the best of both worlds: HK salary, Shenzhen lifestyle." },
+          { zh: "希望未来两地融合能更深入，减少通关障碍", en: "I hope for deeper integration. A borderless future would make my life so much smoother." },
+          { zh: "这种生活方式需要很强的时间管理能力", en: "You need military-grade time management to make this dual-city life work." }
         ],
+        opinion: {
+          title: "About the Border",
+          titleEn: "About the Border",
+          content: "The border defines my existence. It's a calculated trade-off between high income and living costs. Efficient? Yes. But sometimes, I feel like a pendulum, forever swinging between two distinct worlds, never fully resting in either.",
+          contentEn: "The border defines my existence. It's a calculated trade-off between high income and living costs. Efficient? Yes. But sometimes, I feel like a pendulum, forever swinging between two distinct worlds, never fully resting in either."
+        },
         timeline: [
-          { time: "7:00", title: "Morning Routine", titleEn: "Morning Routine", description: "准备出门上班", descriptionEn: "Getting ready for work.", image: "./images/imgHuTL (1).png" },
-          { time: "8:00", title: "Commute", titleEn: "Commute", description: "前往口岸", descriptionEn: "Heading to the border.", image: "./images/imgHuTL (2).png" },
-          { time: "9:00", title: "At Office", titleEn: "At Office", description: "开始一天的工作", descriptionEn: "Start the workday.", image: "./images/imgHuTL (3).png" },
-          { time: "12:30", title: "Lunch Break", titleEn: "Lunch Break", description: "午餐时间", descriptionEn: "Lunch break.", image: "./images/imgHuTL (4).png" },
-          { time: "18:00", title: "Evening Work", titleEn: "Evening Work", description: "处理收尾工作", descriptionEn: "Wrapping up work.", image: "./images/imgHuTL (5).png" },
-          { time: "19:30", title: "Head Home", titleEn: "Head Home", description: "下班返程", descriptionEn: "Heading back home.", image: "./images/imgHuTL (6).png" },
-          { time: "21:00", title: "Home Sweet Home", titleEn: "Home Sweet Home", description: "到家休息", descriptionEn: "Home and resting.", image: "./images/imgHuTL (7).png" }
+          { time: "7:00", title: "Morning Routine", titleEn: "Morning Routine", description: "Waking up in my spacious Futian apartment. Coffee in hand, I watch the Shenzhen skyline. This is my moment of peace.", descriptionEn: "Waking up in my spacious Futian apartment. Coffee in hand, I watch the Shenzhen skyline. This is my moment of peace.", image: "./images/imgHuTL (1).png" },
+          { time: "8:00", title: "Commute", titleEn: "Commute", description: "Walking to Futian Port. The E-channel fingerprint scan takes seconds. It's as fast as a subway gate, but it crosses a system.", descriptionEn: "Walking to Futian Port. The E-channel fingerprint scan takes seconds. It's as fast as a subway gate, but it crosses a system.", image: "./images/imgHuTL (2).png" },
+          { time: "9:00", title: "At Office", titleEn: "At Office", description: "Arrive at Central. I switch modes: English and Cantonese on, high-intensity finance work begins. The pace is relentless.", descriptionEn: "Arrive at Central. I switch modes: English and Cantonese on, high-intensity finance work begins. The pace is relentless.", image: "./images/imgHuTL (3).png" },
+          { time: "12:30", title: "Lunch Break", titleEn: "Lunch Break", description: "A quick lunch in the crowded streets of Central. Expensive and rushed. I find myself missing the ease of Shenzhen delivery.", descriptionEn: "A quick lunch in the crowded streets of Central. Expensive and rushed. I find myself missing the ease of Shenzhen delivery.", image: "./images/imgHuTL (4).png" },
+          { time: "18:00", title: "Evening Work", titleEn: "Evening Work", description: "Colleagues are still going strong. I have to finish this report, but my eye is on the clock—checking the last train home.", descriptionEn: "Colleagues are still going strong. I have to finish this report, but my eye is on the clock—checking the last train home.", image: "./images/imgHuTL (5).png" },
+          { time: "19:30", title: "Head Home", titleEn: "Head Home", description: "Off work. I join the northbound flow. Crossing the border feels like shedding heavy armor. I can breathe again.", descriptionEn: "Off work. I join the northbound flow. Crossing the border feels like shedding heavy armor. I can breathe again.", image: "./images/imgHuTL (6).png" },
+          { time: "21:00", title: "Home Sweet Home", titleEn: "Home Sweet Home", description: "Back in Shenzhen. Late-night snacks with friends. The lively, smoky street food atmosphere makes me feel truly alive.", descriptionEn: "Back in Shenzhen. Late-night snacks with friends. The lively, smoky street food atmosphere makes me feel truly alive.", image: "./images/imgHuTL (7).png" },
+          { time: "22:00", title: "Rest", titleEn: "Rest", description: "Preparing for bed. The dual-city shuttle pauses for a few hours. Tomorrow, we do it all again.", descriptionEn: "Preparing for bed. The dual-city shuttle pauses for a few hours. Tomorrow, we do it all again.", image: "./images/imgHuTL (8).png" }
         ]
       },
       {
@@ -311,39 +370,46 @@
         name: "Zhang",
         nameEn: "Zhang",
         age: 23,
-        role: "香港硕士",
+        role: "Hong Kong Postgraduate",
         roleEn: "Hong Kong Postgraduate",
-        description: "赴港深造，爱好逛街与演唱会",
+        description: "Pursuing master's in HK, loves shopping and concerts",
         descriptionEn: "Pursuing master's in HK, loves shopping and concerts",
         heroImage: "./images/imgZhangPortrait.png",
         avatarImage: "./images/imgZhangCard.png",
         avatarOverlay: null,
-        motivation: "工作一年后来到香港深造。选择来到香港不仅是希望转行Marketing相关行业，同时香港的职场与日常生活对于女性更加友好。",
-        motivationEn: "After a year of work she pursues a master’s in Hong Kong, aiming to shift to marketing; HK’s workplace and daily life are friendlier to women.",
+        motivation: "After a year of work, she came to HK for a master's degree, aiming to pivot to Marketing. She finds HK's workplace and daily life more female-friendly.",
+        motivationEn: "After a year of work, she came to HK for a master's degree, aiming to pivot to Marketing. She finds HK's workplace and daily life more female-friendly.",
         adaptLiving: [
-          { zh: "选课自由，自由时间多。为了能减少通勤开支，她会把课程集中到三天来上课，剩下的时间就可以实习或游乐。", en: "Flexible course selection; she clusters classes into three days to cut commute costs, leaving time for internships or leisure." },
-          { zh: "因为课程密集，中午不追求精致午餐，优先解决\"能睡一会儿\"的地点（图书馆角落/学生中心沙发/空教室）", en: "With dense classes, she prioritizes quick naps over fancy lunches—library corners, student center sofas, empty classrooms." }
+          { zh: "选课自由，自由时间多。为了能减少通勤开支，她会把课程集中到三天来上课，剩下的时间就可以实习或游乐。", en: "Flexible course selection. She clusters classes into three days to cut commute costs, leaving time for internships or leisure." },
+          { zh: "因为课程密集，中午不追求精致午餐，优先解决\"能睡一会儿\"的地点（图书馆角落/学生中心沙发/空教室）", en: "With dense classes, she prioritizes quick naps over fancy lunches—finding spots in library corners or student center sofas." }
         ],
         challenges: [
-          { zh: "早课=必须准点，任何口岸拥堵/交通延误都会让她整天节奏崩盘。", en: "Morning class requires punctuality; any border or transit delay ruins the day." },
-          { zh: "长期早起+跨境折返，午睡变成刚需；一累就很难保持课堂专注与产出。", en: "Early rising and crossing back and forth make naps essential; fatigue hurts focus and output." },
-          { zh: "由于也有不少人与她一样港读深居，因此社交上不会有过多障碍。但她与香港的生活文化依旧存在一层薄膜。", en: "Many also study in HK but live in SZ, so social life is fine; yet a thin film separates her from HK’s culture." }
+          { zh: "早课=必须准点，任何口岸拥堵/交通延误都会让她整天节奏崩盘。", en: "Morning classes require punctuality; any border or transit delay ruins the day's rhythm." },
+          { zh: "长期早起+跨境折返，午睡变成刚需；一累就很难保持课堂专注与产出。", en: "Early rising and daily crossing make naps essential; fatigue impacts classroom focus and output." },
+          { zh: "由于也有不少人与她一样港读深居，因此社交上不会有过多障碍。但她与香港的生活文化依旧存在一层薄膜。", en: "Many peers also live in SZ and study in HK, so social life is fine; yet a thin film separates her from HK’s local culture." }
         ],
         thoughts: [
-          { zh: "我不是不想参与同学的after class，我是真的回不去那么晚。而且深圳的饭菜和shopping环境不香吗哈哈", en: "It’s not that I don’t want to join after class—I just can’t get back that late. And isn’t Shenzhen’s food and shopping great?" },
-          { zh: "我最羡慕住港岛的同学：他们下课回家就能去海边city-walk，而我只有说下午没课的时候才能偶尔在香港街边种草散步玩耍", en: "I envy classmates on HK Island who can go seaside city-walking after class; I can only stroll in HK when I’m free in the afternoon." },
-          { zh: "幸好在香港还有我的姐妹居住，不然晚上听完演唱会很晚了就没地方住了。晚上的边境口岸并不是所有都会开放，凌晨的深港通勤难度还是很大很大的。", en: "Luckily my girlfriends live in HK; otherwise after late concerts I’d have nowhere to stay. Not all borders stay open at night; midnight SZ–HK commuting is truly hard." }
+          { zh: "我不是不想参与同学的after class，我是真的回不去那么晚。而且深圳的饭菜和shopping环境不香吗哈哈", en: "I'm not avoiding after-class hangouts, I just can't stay that late. Plus, isn't Shenzhen's food and shopping great? Haha." },
+          { zh: "我最羡慕住港岛的同学：他们下课回家就能去海边city-walk，而我只有说下午没课的时候才能偶尔在香港街边种草散步玩耍", en: "I envy classmates on HK Island who can go for a seaside city-walk after class. I can only explore HK streets when I have free afternoons." },
+          { zh: "幸好在香港还有我的姐妹居住，不然晚上听完演唱会很晚了就没地方住了。晚上的边境口岸并不是所有都会开放，凌晨的深港通勤难度还是很大很大的。", en: "Luckily I have sisters in HK to crash with after late concerts. Not all borders are open at night, making midnight commuting extremely difficult." }
         ],
+        opinion: {
+          title: "About the Border",
+          titleEn: "About the Border",
+          content: "The border is like a filter. It filters out Shenzhen's noise so I can study, and HK's stress so I can rest. But it also seems to filter out my complete sense of belonging to either city.",
+          contentEn: "The border is like a filter. It filters out Shenzhen's noise so I can study, and HK's stress so I can rest. But it also seems to filter out my complete sense of belonging to either city."
+        },
         timeline: [
-          { time: "6:55", title: "Departure", titleEn: "Departure", description: "她在闹钟声模糊醒来，在家里思索需要带什么东西出发去学校。证件，早餐出门前检查一遍。", descriptionEn: "Waking up to the alarm, thinking about what to bring. ID, breakfast—check before leaving.", image: "./images/imgZhangTL (1).png" },
-          { time: "7:30", title: "On the way", titleEn: "On the way", description: "深圳的清晨很安静，她在地铁上上默默吃早餐。香港的公交上不能进食任何食物", descriptionEn: "Shenzhen's morning is quiet; she eats breakfast silently on the metro. No eating allowed on HK buses.", image: "./images/imgZhangTL (2).png" },
-          { time: "7:55", title: "Arrived at Border", titleEn: "Arrived at Border", description: "人流变成一条线，她开始进入\"自动模式\"：刷证、走路、跟队。有些时候她会忘记带证件，这对他而言就是毁灭打击。", descriptionEn: "The crowd becomes a line; she enters 'auto mode': swipe ID, walk, follow. Sometimes she forgets her ID—a devastating blow.", image: "./images/imgZhangTL (3).png" },
-          { time: "8:10", title: "Metro Transfer", titleEn: "Metro Transfer", description: "早高峰的地铁人总是很多。但是上班前需要注意形象。跨境后的香港地铁通勤是最漫长的等待时间。今天她买了优先座，1想坐着慢慢恢复经历", descriptionEn: "Rush hour metro is crowded. Need to look good before work. The HK leg is the longest wait. Bought a priority seat today to recover energy.", image: "./images/imgZhangTL (4).png" },
-          { time: "9:15", title: "Arrive the company", titleEn: "Arrive the company", description: "进到学校校门的那一刻，她意识到快要上课了，她加快了脚步前往教室", descriptionEn: "Entering the school gate, realizing class is starting soon, she speeds up to the classroom.", image: "./images/imgZhangTL (5).png" },
-          { time: "12:00", title: "Group Work", titleEn: "Group Work", description: "为了减少通勤开支合理支配时间，她选了三堂课在一天同事上完，这也意味着今天她的小组讨论和课程很繁忙。她要坚持不睡午觉。", descriptionEn: "To save commute costs, she packs three classes into one day, meaning busy group discussions. She must resist napping.", image: "./images/imgZhangTL (6).png" },
-          { time: "19:25", title: "CityWalk Wander", titleEn: "CityWalk Wander", description: "下课后她并不着急回家。她想在香港再溜达犹豫一会，呼吸一下新鲜空气。于是用着为数不多的时间citywalk了一会.有时会兴奋忘记回家。", descriptionEn: "After class, she lingers in HK for fresh air, city-walking with her limited time. Sometimes she gets too excited and forgets to go home.", image: "./images/imgZhangTL (7).png" },
-          { time: "20:30", title: "Cross the Border", titleEn: "Cross the Border", description: "依旧是排队，刷卡，等待过境。手机信号往往在这里需要切换。幸好晚上过关速度快，毕竟人没有那么多了。", descriptionEn: "Queue, swipe, wait again. Phone signal switches here. Luckily, night crossing is faster with fewer people.", image: "./images/imgZhangTL (8).png" },
-          { time: "21:00", title: "Go back home", titleEn: "Go back home", description: "回到家一边吃外卖一边写作业", descriptionEn: "Back home, eating takeout while doing homework.", image: "./images/imgZhangTL (9).png" }
+          { time: "6:55", title: "Departure", titleEn: "Departure", description: "Waking up to the alarm, thinking about what to bring. ID, breakfast—double checking before leaving.", descriptionEn: "Waking up to the alarm, thinking about what to bring. ID, breakfast—double checking before leaving.", image: "./images/imgZhangTL (1).png" },
+          { time: "7:30", title: "On the way", titleEn: "On the way", description: "Shenzhen's morning is quiet; she eats breakfast silently on the metro. No eating allowed on HK transport.", descriptionEn: "Shenzhen's morning is quiet; she eats breakfast silently on the metro. No eating allowed on HK transport.", image: "./images/imgZhangTL (2).png" },
+          { time: "7:55", title: "Arrived at Border", titleEn: "Arrived at Border", description: "The crowd becomes a line; she enters 'auto mode': swipe ID, walk, follow. Sometimes she forgets her ID—a devastating blow.", descriptionEn: "The crowd becomes a line; she enters 'auto mode': swipe ID, walk, follow. Sometimes she forgets her ID—a devastating blow.", image: "./images/imgZhangTL (3).png" },
+          { time: "8:10", title: "Metro Transfer", titleEn: "Metro Transfer", description: "Rush hour metro is crowded. Need to maintain image. The HK leg is the longest wait. Bought a first-class seat today to recover energy.", descriptionEn: "Rush hour metro is crowded. Need to maintain image. The HK leg is the longest wait. Bought a first-class seat today to recover energy.", image: "./images/imgZhangTL (4).png" },
+          { time: "9:15", title: "Arrive at School", titleEn: "Arrive at School", description: "Entering the school gate, realizing class is starting soon, she speeds up to the classroom.", descriptionEn: "Entering the school gate, realizing class is starting soon, she speeds up to the classroom.", image: "./images/imgZhangTL (5).png" },
+          { time: "12:00", title: "Group Work", titleEn: "Group Work", description: "To save commute costs, she packs three classes into one day, meaning busy group discussions. She must resist napping.", descriptionEn: "To save commute costs, she packs three classes into one day, meaning busy group discussions. She must resist napping.", image: "./images/imgZhangTL (6).png" },
+          { time: "16:00", title: "Library Time", titleEn: "Library Time", description: "Researching in the library after class. HK's academic resources are rich; must make the most of them.", descriptionEn: "Researching in the library after class. HK's academic resources are rich; must make the most of them.", image: "./images/imgZhangTL (7).png" },
+          { time: "19:25", title: "CityWalk Wander", titleEn: "CityWalk Wander", description: "After class, she lingers in HK for fresh air, city-walking with her limited time. Sometimes she gets too excited and forgets to go home.", descriptionEn: "After class, she lingers in HK for fresh air, city-walking with her limited time. Sometimes she gets too excited and forgets to go home.", image: "./images/imgZhangTL (8).png" },
+          { time: "20:30", title: "Cross the Border", titleEn: "Cross the Border", description: "Queue, swipe, wait again. Phone signal switches here. Luckily, night crossing is faster with fewer people.", descriptionEn: "Queue, swipe, wait again. Phone signal switches here. Luckily, night crossing is faster with fewer people.", image: "./images/imgZhangTL (9).png" },
+          { time: "21:00", title: "Go back home", titleEn: "Go back home", description: "Back home, eating takeout while doing homework.", descriptionEn: "Back home, eating takeout while doing homework.", image: "./images/imgZhangTL (9).png" }
         ]
       },
       {
@@ -375,6 +441,12 @@
           { zh: "每次北上都像是探险，总能发现新的好店和美食", en: "Every northbound trip is an adventure with new shops and foods." },
           { zh: "希望通关能更便利，这样就能更频繁地来深圳了", en: "Hopes easier clearance for more frequent SZ trips." }
         ],
+        opinion: {
+          title: "关于边界",
+          titleEn: "About the Border",
+          content: "作为消费者，边界对我来说就是'性价比'的分界线。我希望两边的支付和物流能完全打通，那样我就真的可以把深圳当成我的后花园了。",
+          contentEn: "As a consumer, the border is the line of 'cost-performance ratio'. I hope payment and logistics will be fully integrated, so I can truly treat Shenzhen as my backyard."
+        },
         timeline: [
           { time: "10:00", title: "Start Journey", titleEn: "Start Journey", description: "周末早晨，准备北上消费", descriptionEn: "Weekend morning, ready to go north for shopping.", image: ASSETS.timeline1 },
           { time: "11:00", title: "Arrive Shenzhen", titleEn: "Arrive Shenzhen", description: "顺利过关，开始购物之旅", descriptionEn: "Smooth crossing, start the shopping spree.", image: ASSETS.timeline2 },
@@ -449,7 +521,7 @@
           <!-- Persona Header -->
           <div class="mb-8">
             <div class="flex items-baseline gap-4 mb-2">
-              <h1 class="text-5xl font-extrabold text-[#4DB6AC]">${isEn ? (persona.nameEn || persona.name) : persona.name}</h1>
+              <h1 class="text-5xl font-extrabold text-slate-900">${isEn ? (persona.nameEn || persona.name) : persona.name}</h1>
               <span class="text-xl text-[#2C3E50] font-semibold">Age: ${persona.age}</span>
             </div>
             <div class="flex items-center gap-3">
@@ -513,6 +585,20 @@
                   <p class="text-[#546E7A] text-sm leading-relaxed italic">"${isEn ? thought.en : thought.zh}"</p>
                 </div>
               `).join('')}
+              
+              <!-- Opinion Card (Bento Box) -->
+              <div class="mt-8 p-6 bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-[16px] rounded-[24px] shadow-[0_8px_32px_rgba(77,182,172,0.2)] border border-[#4DB6AC]/20 relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-[#4DB6AC]/10 rounded-bl-[100px] -mr-4 -mt-4 transition-all duration-500 group-hover:bg-[#4DB6AC]/20"></div>
+                
+                <h3 class="text-xl font-bold text-[#2C3E50] mb-3 flex items-center gap-2 relative z-10">
+                  <span class="text-2xl">🍱</span>
+                  ${isEn ? (persona.opinion.titleEn || persona.opinion.title) : persona.opinion.title}
+                </h3>
+                
+                <p class="text-[#546E7A] text-sm leading-relaxed relative z-10 italic">
+                  "${isEn ? (persona.opinion.contentEn || persona.opinion.content) : persona.opinion.content}"
+                </p>
+              </div>
             </div>
           </div>
 
@@ -522,9 +608,9 @@
               <span class="w-10 h-10 rounded-full bg-[#4DB6AC] flex items-center justify-center text-white text-xl">
                 📅
               </span>
-              <span data-zh="跨境一日生活" data-en="Daily Cross-Border Living">跨境一日生活</span>
+              <span data-zh="Daily Cross-Border Living" data-en="Daily Cross-Border Living">Daily Cross-Border Living</span>
             </h2>
-            <p class="text-xs text-[#4DB6AC] mb-4"><span data-zh="滚动查看一日完整作息 →" data-en="Scroll to view a full day →">滚动查看一日完整作息 →</span></p>
+            <p class="text-xs text-[#4DB6AC] mb-4"><span data-zh="Scroll to view a full day →" data-en="Scroll to view a full day →">Scroll to view a full day →</span></p>
 
             <!-- Timeline Container -->
             <div id="timelineContainer" class="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
@@ -565,10 +651,20 @@
                       : 'w-2 h-2 bg-[#4DB6AC] opacity-30 hover:opacity-60'
                   }"
                   data-timeline-index="${idx}"
-                  aria-label="跳转到第${idx + 1}个时间点"
+                  aria-label="Jump to time point ${idx + 1}"
                 ></button>
               `).join('')}
             </div>
+          </div>
+          
+          <!-- Next Page Button -->
+          <div class="flex justify-end mt-12 mb-8 border-t border-[#4DB6AC]/20 pt-8">
+            <a href="3-3.html" class="group flex items-center gap-2 px-6 py-3 bg-[#4DB6AC] text-white rounded-full font-semibold hover:bg-[#00897B] transition-all duration-300 shadow-[0_4px_14px_rgba(77,182,172,0.4)] hover:shadow-[0_6px_20px_rgba(77,182,172,0.6)] hover:-translate-y-1">
+              <span>Next: Timeline</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
           </div>
         </div>
       `;
@@ -724,14 +820,12 @@
     function init() {
       // Handle Navigation Active State
       const currentFile = window.location.pathname.split("/").pop();
-      if (currentFile.includes("3-1") || currentFile === "") {
-        const el = document.getElementById('nav-3-1'); if(el) el.classList.add('active');
-      } else if (currentFile.includes("3-2")) {
+      if (currentFile.includes("3-2")) {
         const el = document.getElementById('nav-3-2'); if(el) el.classList.add('active');
+      } else if (currentFile.includes("3-3fix")) {
+        const el = document.getElementById('nav-phenomenon'); if(el) el.classList.add('active');
       } else if (currentFile.includes("3-3") || currentFile.includes("timeline")) {
         const el = document.getElementById('nav-timeline'); if(el) el.classList.add('active');
-      } else if (currentFile.includes("4-1") || currentFile.includes("future")) {
-        const el = document.getElementById('nav-future'); if(el) el.classList.add('active');
       }
 
       // Handle Language Toggle
@@ -760,5 +854,6 @@
     }
   </script>
 
+    <script src="global-nav.js"></script>
 </body>
 </html>

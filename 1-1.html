@@ -25,8 +25,10 @@
         ::-webkit-scrollbar-thumb { background: #0891b2; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-50">
+<body class="bg-slate-50 pb-32">
     <div id="root"></div>
+
+    <script src="global-nav.js"></script>
 
     <script type="text/babel">
         const { 
@@ -170,9 +172,7 @@
                     {/* Navigation Bar */}
                     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4">
                         <div className="max-w-7xl mx-auto flex justify-between items-center">
-                            <div className="flex items-center gap-2 font-black text-xl tracking-tighter text-cyan-700">
-                                <Icon name="Zap" size={24} /> <span>GBA.FLOW</span>
-                            </div>
+
                             <div className="hidden md:flex gap-8 items-center text-sm font-bold uppercase tracking-widest text-slate-400">
                                 {t.nav.map((item, i) => (
                                     <button 
@@ -199,9 +199,9 @@
                         <div className="relative z-10 text-center px-6">
                             <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-6">
                                 {lang === 'en' ? (
-                                    <>THE <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-700 to-cyan-500">RESURGENCE</span></>
+                                    <span className="text-[#00997A] font-sans">RECOVERY</span>
                                 ) : (
-                                    <>流量<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-700 to-cyan-500">归来</span></>
+                                    <span className="text-[#00997A] font-sans">流量归来</span>
                                 )}
                             </h1>
                             <p className="text-xl font-mono tracking-widest uppercase mb-12 text-slate-500">{t.heroSubtitle}</p>
@@ -332,6 +332,17 @@
                             </div>
                         </div>
                     </section>
+
+                    {/* Next Chapter Navigation */}
+                    <div className="py-24 bg-slate-100 flex justify-center pb-40">
+                        <button 
+                            onClick={() => window.location.href = 'index.html?step=3'}
+                            className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-cyan-900 rounded-full text-sm font-bold tracking-widest uppercase shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-cyan-100"
+                        >
+                            <span>Next Chapter: Folded City</span>
+                            <Icon name="ArrowRight" size={16} className="group-hover:translate-x-1 transition-transform" />
+                        </button>
+                    </div>
                 </div>
             );
         };

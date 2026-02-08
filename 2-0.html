@@ -433,49 +433,10 @@
     </style>
 </head>
 <body>
-    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-2xl">
-        <div class="bg-white/70 backdrop-blur-md border border-slate-200/50 shadow-lg rounded-2xl px-6 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
-                <span class="text-xs font-bold tracking-widest text-slate-800 uppercase font-mono">NBSB Research</span>
-            </div>
-            <div class="flex gap-4 md:gap-8">
-                <a href="3-1.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-1">跨时空分析</a>
-                <a href="3-2.html" class="nav-link text-sm font-semibold transition-colors hover:text-primary" id="nav-3-2">生活流图鉴</a>
-            </div>
-            <button onclick="window.print()" class="hidden md:block text-slate-400 hover:text-slate-600">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-            </button>
-        </div>
-    </nav>
+    <!-- Global Nav Integration -->
+    <script src="global-nav.js"></script>
 
-    <style>
-        .nav-link { color: #64748b; position: relative; }
-        .nav-link.active { color: #0E7490; }
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #0E7490;
-            border-radius: 2px;
-        }
-        body { animation: fadeInPage 0.8s ease-out; }
-        @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
-
-    <script>
-        const currentFile = window.location.pathname.split("/").pop();
-        if (currentFile === "3-1.html" || currentFile === "") {
-            document.getElementById('nav-3-1').classList.add('active');
-        } else if (currentFile === "3-2.html") {
-            document.getElementById('nav-3-2').classList.add('active');
-        }
-    </script>
-
-    <!-- CHAPTER NAVIGATION -->
+    <!-- CHAPTER NAVIGATION (Internal) -->
     <div class="chapter-nav-container">
         <button id="nav-c1" class="nav-btn active" onclick="switchChapter(1)">
             1. Flows
@@ -745,29 +706,29 @@
                     portStats[pid] = { annual: annual, daily: parseInt(daily), daily10k: parseFloat(daily10k), share: parseFloat(share), growth: growth, desc: desc, status: annual > 0 ? "Active" : "Closed" };
                 });
                 let events = [];
-                if (year === "2017") events.push({ tag: "Policy", date: "All Year", title: "'One Trip Per Week' Normalized", desc: "Restriction on Shenzhen residents visiting HK (implemented 2015) became the norm to ease community pressure.", impact: "Limited Shenzhen visitor frequency. Mainland traffic remained southbound and concentrated at Lo Wu (Traditional Railway Hegemony).", img: "2017一周一行.jpg" });
+                if (year === "2017") events.push({ tag: "Policy", date: "All Year", title: "'One Trip Per Week' Normalized", desc: "Restriction on Shenzhen residents visiting HK (implemented 2015) became the norm to ease community pressure.", impact: "Limited Shenzhen visitor frequency. Mainland traffic remained southbound and concentrated at Lo Wu (Traditional Railway Hegemony).", img: "images/2017一周一行.jpg" });
                 if (year === "2018") {
-                    events.push({ tag: "Infra", date: "2018-09-23", title: "HSR Opening & Co-location", desc: "HK connected to National HSR Network. 'Co-location Arrangement' at West Kowloon enabled CBD-to-CBD express.", impact: "Created new demand and diverted sea passengers. 14 mins to Futian broke traditional time barriers.", img: "2018一地两检.jpg" });
-                    events.push({ tag: "Infra", date: "2018-10-24", title: "HZMB Official Opening", desc: "55km sea-crossing bridge opened, drastically cutting travel time to the West Pearl River Delta.", impact: "Pushed 2018 traffic to a record high (329.7M), integrating the West Bank into the 'One-Hour Living Circle'.", img: "2018港珠澳大桥正式通车.jpg" });
+                    events.push({ tag: "Infra", date: "2018-09-23", title: "HSR Opening & Co-location", desc: "HK connected to National HSR Network. 'Co-location Arrangement' at West Kowloon enabled CBD-to-CBD express.", impact: "Created new demand and diverted sea passengers. 14 mins to Futian broke traditional time barriers.", img: "images/2018一地两检.jpg" });
+                    events.push({ tag: "Infra", date: "2018-10-24", title: "HZMB Official Opening", desc: "55km sea-crossing bridge opened, drastically cutting travel time to the West Pearl River Delta.", impact: "Pushed 2018 traffic to a record high (329.7M), integrating the West Bank into the 'One-Hour Living Circle'.", img: "images/2018港珠澳大桥正式通车.jpg" });
                 }
-                if (year === "2019") events.push({ tag: "Society", date: "2019 H2", title: "Social Unrest Incidents", desc: "A series of social instability events occurred in Hong Kong.", impact: "Sea passenger numbers plunged 37.4%. HSR and Bridge traffic remained resilient due to closed-loop management.", img: "2019社会风波 (“修例风波”).jpg" });
+                if (year === "2019") events.push({ tag: "Society", date: "2019 H2", title: "Social Unrest Incidents", desc: "A series of social instability events occurred in Hong Kong.", impact: "Sea passenger numbers plunged 37.4%. HSR and Bridge traffic remained resilient due to closed-loop management.", img: "images/2019社会风波 (“修例风波”).jpg" });
                 if (year === "2020") {
-                    events.push({ tag: "Pandemic", date: "2020-02-04", title: "Full Border Closure (COVID-19)", desc: "Passenger services suspended at Lo Wu, Lok Ma Chau, etc. Only Airport and Shenzhen Bay remained partially open.", impact: "Cross-border flow dropped to near zero. 2020 traffic plunged 90.1% vs 2019, forming a historic 'Data Canyon'.", img: "2020全面封关 (COVID-19).jpg" });
-                    events.push({ tag: "Logistics", date: "2020-08-26", title: "Heung Yuen Wai Port (Cargo)", desc: "Opened for cargo first. Implemented 'East-in East-out' strategy to divert truck traffic.", impact: "Reshaped logistics. Shenzhen Bay cargo surged 125.7%, securing material supplies during the pandemic.", img: "2020香园围.jpg" });
+                    events.push({ tag: "Pandemic", date: "2020-02-04", title: "Full Border Closure (COVID-19)", desc: "Passenger services suspended at Lo Wu, Lok Ma Chau, etc. Only Airport and Shenzhen Bay remained partially open.", impact: "Cross-border flow dropped to near zero. 2020 traffic plunged 90.1% vs 2019, forming a historic 'Data Canyon'.", img: "images/2020全面封关 (COVID-19).jpg" });
+                    events.push({ tag: "Logistics", date: "2020-08-26", title: "Heung Yuen Wai Port (Cargo)", desc: "Opened for cargo first. Implemented 'East-in East-out' strategy to divert truck traffic.", impact: "Reshaped logistics. Shenzhen Bay cargo surged 125.7%, securing material supplies during the pandemic.", img: "images/2020香园围.jpg" });
                 }
-                if (year === "2021" || year === "2022") events.push({ tag: "Tech", date: "Late 2021", title: "Contactless e-Channel Rollout", desc: "New clearance system with facial recognition for 'touch-free' passage.", impact: "Reduced clearance time to 7 seconds, preparing technical capacity for the eventual post-pandemic rebound.", img: "2021非触式e-道全面推广.jpeg" });
+                if (year === "2021" || year === "2022") events.push({ tag: "Tech", date: "Late 2021", title: "Contactless e-Channel Rollout", desc: "New clearance system with facial recognition for 'touch-free' passage.", impact: "Reduced clearance time to 7 seconds, preparing technical capacity for the eventual post-pandemic rebound.", img: "images/2021非触式e-道全面推广.jpeg" });
                 if (year === "2023") {
-                    events.push({ tag: "Recovery", date: "2023-02-06", title: "Full Resumption of Travel", desc: "All ports reopened without quotas. Heung Yuen Wai opened for passengers (first with direct parking).", impact: "Data showed a vertical 'V-shaped' rebound. Heung Yuen Wai became an instant hit for drivers/cyclists.", img: "2023全面恢复正常通关.jpg" });
-                    events.push({ tag: "Policy", date: "2023-07-01", title: "'Northbound Travel for HK Vehicles'", desc: "Allowed eligible HK private cars to enter Guangdong via HZMB without dual plates.", impact: "Shifted travel mode from 'Public Transport Dominant' to 'Private Driving', boosting HZMB traffic.", img: "2023“港车北上”政策实施.jpg" });
-                    events.push({ tag: "Service", date: "2023-08-14", title: "HSR 'Flexi-trip' (Futian)", desc: "Free ticket changes up to 3 times for West Kowloon-Futian, even 1 hour after departure.", impact: "Operationalized HSR like a metro system, boosting short-haul traffic and changing rigid ticketing habits.", img: "2023高铁“灵活行” (福田段).jpg" });
+                    events.push({ tag: "Recovery", date: "2023-02-06", title: "Full Resumption of Travel", desc: "All ports reopened without quotas. Heung Yuen Wai opened for passengers (first with direct parking).", impact: "Data showed a vertical 'V-shaped' rebound. Heung Yuen Wai became an instant hit for drivers/cyclists.", img: "images/2023全面恢复正常通关.jpg" });
+                    events.push({ tag: "Policy", date: "2023-07-01", title: "'Northbound Travel for HK Vehicles'", desc: "Allowed eligible HK private cars to enter Guangdong via HZMB without dual plates.", impact: "Shifted travel mode from 'Public Transport Dominant' to 'Private Driving', boosting HZMB traffic.", img: "images/2023“港车北上”政策实施.jpg" });
+                    events.push({ tag: "Service", date: "2023-08-14", title: "HSR 'Flexi-trip' (Futian)", desc: "Free ticket changes up to 3 times for West Kowloon-Futian, even 1 hour after departure.", impact: "Operationalized HSR like a metro system, boosting short-haul traffic and changing rigid ticketing habits.", img: "images/2023高铁“灵活行” (福田段).jpg" });
                 }
                 if (year === "2024") {
-                    events.push({ tag: "Policy", date: "2024-03-18", title: "'Flexi-trip' to Shenzhen North", desc: "Flexible ticket changes extended to Shenzhen North Station, connecting deeper into residential zones.", impact: " fueled 'Cross-border Commuting', supporting the 'Living in Shenzhen, Working in HK' lifestyle.", img: "2024延长通关服务时间.jpg" });
-                    events.push({ tag: "Service", date: "2024 Holidays", title: "Extended Clearance Hours", desc: "Shenzhen Bay 24h clearance; Lo Wu extended to 2am during major holidays.", impact: "Facilitated 'Northbound Nightlife'. 2024 saw a structural reversal: HK northbound traffic exceeded southbound.", img: "2024“灵活行”延伸至深圳北站.jpg" });
+                    events.push({ tag: "Policy", date: "2024-03-18", title: "'Flexi-trip' to Shenzhen North", desc: "Flexible ticket changes extended to Shenzhen North Station, connecting deeper into residential zones.", impact: " fueled 'Cross-border Commuting', supporting the 'Living in Shenzhen, Working in HK' lifestyle.", img: "images/2024“灵活行”延伸至深圳北站.jpg" });
+                    events.push({ tag: "Service", date: "2024 Holidays", title: "Extended Clearance Hours", desc: "Shenzhen Bay 24h clearance; Lo Wu extended to 2am during major holidays.", impact: "Facilitated 'Northbound Nightlife'. 2024 saw a structural reversal: HK northbound traffic exceeded southbound.", img: "images/2024延长通关服务时间.jpg" });
                 }
                 if (year === "2025") {
-                    events.push({ tag: "Integration", date: "2025-10-13", title: "Closed Road Permit (CRP) Waived", desc: "Approved 'Northbound' vehicles no longer need CRP or fees, cutting red tape.", impact: "Cross-border driving became as simple as local driving, balancing bi-directional flows.", img: "2025免除封闭道路通行许可证 (CRP).jpg" });
-                    events.push({ tag: "Future", date: "2026-01 (Announced)", title: "e-Channel Age Lowered to 7", desc: "Children aged 7+ allowed to use automated gates (expected Jan 2026).", impact: "Resolves family queuing bottlenecks, boosting efficiency for family tourism.", img: "2025e-道适用年龄降至7岁.jpg" });
+                    events.push({ tag: "Integration", date: "2025-10-13", title: "Closed Road Permit (CRP) Waived", desc: "Approved 'Northbound' vehicles no longer need CRP or fees, cutting red tape.", impact: "Cross-border driving became as simple as local driving, balancing bi-directional flows.", img: "images/2025免除封闭道路通行许可证 (CRP).jpg" });
+                    events.push({ tag: "Future", date: "2026-01 (Announced)", title: "e-Channel Age Lowered to 7", desc: "Children aged 7+ allowed to use automated gates (expected Jan 2026).", impact: "Resolves family queuing bottlenecks, boosting efficiency for family tourism.", img: "images/2025e-道适用年龄降至7岁.jpg" });
                 }
                 db[year] = { stats: { total: (yData.total / 100000000).toFixed(2), daily: (yData.total / 365 / 10000).toFixed(1), unit: "Billion" }, ports: portStats, events: events };
             });
@@ -1076,6 +1037,7 @@
             const [showSearch, setShowSearch] = useState(false);
             const [searchQuery, setSearchQuery] = useState("");
             const [replayCount, setReplayCount] = useState(0);
+            const [copySuccess, setCopySuccess] = useState('');
 
             const mapRef = useRef(null);
             const mainLayerRef = useRef(null);
@@ -1094,7 +1056,7 @@
                         return parsed.org || inputKey;
                     } catch (e) { return inputKey; }
                 };
-                setApiKey(processKey(DEFAULT_KEY_INPUT));
+                setApiKey(processKey('eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjI0NmY0YzlhNjI5NzQyMjlhZGYzNmQyMDEyYzM2YmZiIiwiaCI6Im11cm11cjY0In0='));
             }, []);
 
             useEffect(() => {
@@ -1481,6 +1443,16 @@
                     .map(([id, config]) => ({ id, ...config }));
                 return historyFilter === 'all' ? valid : valid.filter(r => r.type === historyFilter);
             };
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    setCopySuccess('Copied to clipboard!');
+                    setTimeout(() => setCopySuccess(''), 2000);
+                }, (err) => {
+                    setCopySuccess('Failed to copy!');
+                    setTimeout(() => setCopySuccess(''), 2000);
+                });
+            };
             
             useEffect(() => {
                 if (!mainLayerRef.current) return;
@@ -1641,9 +1613,35 @@
                                     </div>
                                     <div className="mb-4">
                                         <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">API Key (OpenRouteService)</label>
-                                        <div className="flex items-center gap-2 bg-white/50 border border-slate-200 p-2 rounded-lg">
+                                        <div className="flex items-center gap-2 bg-white/50 border border-slate-200 p-2 rounded-lg mb-2">
                                             <Icon name="Key" size={14} className="text-[#0E7490]"/>
                                             <input type="text" value={apiKey} onChange={e => setApiKey(e.target.value)} className="flex-1 bg-transparent text-[10px] font-mono text-slate-600 outline-none truncate" placeholder="Enter ORS API Key" />
+                                        </div>
+                                        
+                                        <div 
+                                            onClick={() => {
+                                                const key = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjI0NmY0YzlhNjI5NzQyMjlhZGYzNmQyMDEyYzM2YmZiIiwiaCI6Im11cm11cjY0In0=";
+                                                navigator.clipboard.writeText(key).then(() => {
+                                                    setCopySuccess('Copied!');
+                                                    setTimeout(() => setCopySuccess(''), 2000);
+                                                });
+                                            }}
+                                            className="group relative cursor-pointer bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 p-3 rounded-xl shadow-sm hover:shadow-md hover:border-[#0E7490] transition-all duration-300"
+                                        >
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Demo Key (Click to Copy)</span>
+                                                <Icon name={copySuccess ? "Check" : "Key"} size={12} className={copySuccess ? "text-green-500" : "text-slate-400 group-hover:text-[#0E7490]"} />
+                                            </div>
+                                            <code className="block w-full text-[10px] font-mono text-slate-600 truncate opacity-70 group-hover:opacity-100 transition-opacity">
+                                                eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjI0NmY0YzlhNjI5NzQyMjlhZGYzNmQyMDEyYzM2YmZiIiwiaCI6Im11cm11cjY0In0=
+                                            </code>
+                                            {copySuccess && (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-white/90 rounded-xl backdrop-blur-sm animate-fade-in">
+                                                    <span className="text-xs font-bold text-[#0E7490] flex items-center gap-1">
+                                                        <Icon name="Check" size={14}/> Copied!
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <button onClick={fetchIsochrones} disabled={isLoading} className={`w-full py-3 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-2 transition-all ${isLoading ? 'bg-slate-400' : 'bg-gradient-to-r from-[#0E7490] to-[#06B6D4] hover:shadow-xl'}`}>
@@ -1849,7 +1847,7 @@
                 driver: {
                     year: "2018 & 2022",
                     tag: "Infrastructure",
-                    image: "https://images.unsplash.com/photo-1474487548417-781cb714c2f0?auto=format&fit=crop&w=800",
+                    image: "images/Rail Network Integration.jpg",
                     title: "Rail Network Integration",
                     desc: "The commissioning of the High Speed Rail (XRL) compressed travel to Guangzhou to 48 mins, while the East Rail Line Cross-Harbour Extension connected HK Island directly to the Shenzhen border."
                 }
@@ -1867,7 +1865,7 @@
                 driver: {
                     year: "2018 - 2024",
                     tag: "Technology",
-                    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800",
+                    image: "images/Smart Clearance Evolution.jpg",
                     title: "Smart Clearance Evolution",
                     desc: "From 'Co-location' arrangements to the removal of health declarations and the pilot of biometric 'Senseless Clearance', physical and digital barriers have been systematically dismantled."
                 }
@@ -1885,7 +1883,7 @@
                 driver: {
                     year: "2023",
                     tag: "Consumption",
-                    image: "https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?auto=format&fit=crop&w=800",
+                    image: "images/The Costco Effect.jpg",
                     title: "The Costco Effect",
                     desc: "Post-pandemic reopening combined with currency advantages led to a surge in northbound consumption, driven by warehouse supermarkets like Sam's Club filling a gap in HK's retail market."
                 }
@@ -1903,7 +1901,7 @@
                 driver: {
                     year: "2023",
                     tag: "Policy",
-                    image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=800",
+                    image: "images/Northbound Travel Scheme.jpg",
                     title: "Northbound Travel Scheme",
                     desc: "The 'Northbound Travel for HK Vehicles' policy allowed single-plate private cars to enter Guangdong via the HZMB, removing the expensive barrier of dual license plates."
                 }
@@ -1921,7 +1919,7 @@
                 driver: {
                     year: "2020",
                     tag: "Urban Planning",
-                    image: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800",
+                    image: "images/Port Function Split.jpg",
                     title: "Port Function Split",
                     desc: "The opening of Liantang/Heung Yuen Wai port implemented the 'East-in East-out' cargo strategy, allowing older ports like Huanggang to be redeveloped exclusively for passenger use."
                 }
@@ -1939,7 +1937,7 @@
                 driver: {
                     year: "2023 - 2024",
                     tag: "FinTech",
-                    image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?auto=format&fit=crop&w=800",
+                    image: "images/E-Wallet Interoperability.jpg",
                     title: "E-Wallet Interoperability",
                     desc: "AlipayHK and WeChat Pay HK achieved full coverage of mainland merchants and public transport, eliminating the need for cash exchange and effectively unifying the payment ecosystem."
                 }
@@ -1952,7 +1950,7 @@
                 year: "Pre-2017", 
                 title: "The Hard Border", 
                 tag: "Baseline", 
-                img: "https://images.unsplash.com/photo-1558289721-39656828859e?auto=format&fit=crop&w=800",
+                img: "images/The Hard Border.jpg",
                 desc: "Establishment of fundamental frameworks and initial connectivities.",
                 events: [
                     { year: "2003", title: "CEPA & Free Travel", tag: "Policy", desc: "Signed CEPA and launched 'Individual Visit Scheme', sparking the first explosion in cross-border flow." },
@@ -1966,7 +1964,7 @@
                 year: "2017", 
                 title: "The Blueprint", 
                 tag: "Policy", 
-                img: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=800",
+                img: "images/The Blueprint.jpg",
                 desc: "Resolving disputes and setting national strategies.",
                 events: [
                     { year: "Jan", title: "River Loop Memo", tag: "Policy", desc: "Signed memorandum for River Loop 'Co-development', resolving 20-year ownership disputes." },
@@ -1979,7 +1977,7 @@
                 year: "2018", 
                 title: "Infrastructure Leap", 
                 tag: "Infra", 
-                img: "https://images.unsplash.com/photo-1532189912648-2895f32a0c4f?auto=format&fit=crop&w=800",
+                img: "images/Infrastructure Leap.jpg",
                 desc: "Physical connections upgraded to world-class standards.",
                 events: [
                     { year: "Feb", title: "31 Measures", tag: "Welfare", desc: "Released '31 Measures' to benefit HK people, gradually removing employment barriers in the mainland." },
@@ -1992,7 +1990,7 @@
                 year: "2019", 
                 title: "GBA Strategy", 
                 tag: "Strategy", 
-                img: "https://images.unsplash.com/photo-1619175474640-5a98135870f7?auto=format&fit=crop&w=800",
+                img: "images/GBA Strategy.jpg",
                 desc: "Top-level design amidst social challenges.",
                 events: [
                     { year: "Feb", title: "GBA Outline Plan", tag: "Strategy", desc: "Outline Development Plan released, clarifying Hong Kong's status as a core engine and quality living circle." },
@@ -2004,7 +2002,7 @@
                 year: "2020", 
                 title: "The Freeze", 
                 tag: "Pandemic", 
-                img: "https://images.unsplash.com/photo-1584036561566-b45238f2e26f?auto=format&fit=crop&w=800",
+                img: "images/The Freeze.jpg",
                 desc: "Pandemic forces physical closure but accelerates digital reform.",
                 events: [
                     { year: "Feb", title: "Border Closure", tag: "Health", desc: "Major land passenger ports suspended services due to outbreak; cross-border flow almost ceased." },
@@ -2016,7 +2014,7 @@
                 year: "2021", 
                 title: "Digital Integration", 
                 tag: "Tech", 
-                img: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?auto=format&fit=crop&w=800",
+                img: "images/Digital Integration.jpg",
                 desc: "Health codes and strategic expansions.",
                 events: [
                     { year: "All", title: "Health Code", tag: "Tech", desc: "'Return2hk/Come2hk' schemes promoted digital synchronization of health codes and ID systems." },
@@ -2029,7 +2027,7 @@
                 year: "2022", 
                 title: "Transport Links", 
                 tag: "Transport", 
-                img: "https://images.unsplash.com/photo-1582252445853-273618685cb5?auto=format&fit=crop&w=800",
+                img: "images/Transport Links.jpg",
                 desc: "Railways cross the harbour and new cultural landmarks.",
                 events: [
                     { year: "May", title: "East Rail Ext.", tag: "Transport", desc: "Cross-harbour extension opened. Admiralty directly connects to Lo Wu. Rail crosses Victoria Harbour to border." },
@@ -2041,7 +2039,7 @@
                 year: "2023", 
                 title: "The Reopening", 
                 tag: "Milestone", 
-                img: "https://images.unsplash.com/photo-1622627916327-0243486be4f4?auto=format&fit=crop&w=800",
+                img: "images/The Reopening.jpg",
                 desc: "Borders open and new travel policies unleash demand.",
                 events: [
                     { year: "Feb", title: "Full Reopening", tag: "Milestone", desc: "Ports fully resumed normal clearance; quotas/appointments cancelled. Dual-city life restarted." },
@@ -2054,7 +2052,7 @@
                 year: "2024", 
                 title: "Living Circle", 
                 tag: "Network", 
-                img: "https://images.unsplash.com/photo-1623838382902-140087790b9b?auto=format&fit=crop&w=800",
+                img: "images/Living Circle.jpg",
                 desc: "Expanding the radius of life to the Golden Inner Bay.",
                 events: [
                     { year: "Jan", title: "Tax Incentives", tag: "Welfare", desc: "'Hong Kong People, Hong Kong Tax' policy expanded in Qianhai; individual income tax differential exempted." },
@@ -2068,7 +2066,7 @@
                 year: "2025", 
                 title: "Future Fusion", 
                 tag: "Future", 
-                img: "https://images.unsplash.com/photo-1516245834210-c4c14278733f?auto=format&fit=crop&w=800",
+                img: "images/Future Fusion.jpg",
                 desc: "Seamless borders and deep institutional integration.",
                 events: [
                     { year: "Mar", title: "Western Rail", tag: "Infra", desc: "HK-SZ Western Rail (Hung Shui Kiu - Qianhai) enters detailed planning; exploring new clearance modes." },
@@ -2172,18 +2170,24 @@
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent text-primary text-[10px] font-bold tracking-wider mb-3 border border-secondary/30">
                                 <i className="fas fa-database"></i> PART 3: DATA NARRATIVE
                             </div>
-                            <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
-                                Borderless <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Dual City</span>
+                            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+                                <span className="text-[#00997A] font-sans">THE FOLDED CITY</span>
                             </h1>
                             <p className="text-slate-500 mt-2 max-w-lg leading-relaxed">
                                 From administrative boundary to metropolitan interface.
                                 <br/>Tracking the structural dissolution of distance (2017-2025).
                             </p>
                         </div>
-                        <button onClick={onNavigate} className="group flex items-center gap-3 px-6 py-3 bg-slate-900 text-white rounded-full font-bold text-sm hover:bg-primary transition-colors shadow-lg hover:shadow-primary/30">
-                            <span>Explore Timeline</span>
-                            <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                        </button>
+                        <div className="flex gap-3">
+                            <button onClick={() => window.location.href='index.html?step=4'} className="group flex items-center gap-3 px-6 py-3 bg-white text-slate-900 border border-slate-200 rounded-full font-bold text-sm hover:bg-slate-50 transition-colors shadow-lg hover:shadow-xl">
+                                <span>Go to Chapter 3</span>
+                                <i className="fas fa-external-link-alt group-hover:scale-110 transition-transform text-xs"></i>
+                            </button>
+                            <button onClick={onNavigate} className="group flex items-center gap-3 px-6 py-3 bg-slate-900 text-white rounded-full font-bold text-sm hover:bg-primary transition-colors shadow-lg hover:shadow-primary/30">
+                                <span>Explore Timeline</span>
+                                <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                        </div>
                     </div>
 
                     {/* Bento Grid */}
@@ -2348,9 +2352,18 @@
                         ))}
                     </div>
 
-                    <button onClick={onRestart} className="px-8 py-3 rounded-full border border-slate-200 text-slate-500 hover:text-primary hover:border-primary hover:bg-accent/50 transition-all text-sm font-bold uppercase tracking-widest">
-                        <i className="fas fa-undo mr-2"></i> Replay Narrative
-                    </button>
+                    <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+                        <button onClick={onRestart} className="px-8 py-3 rounded-full border border-slate-200 text-slate-500 hover:text-primary hover:border-primary hover:bg-accent/50 transition-all text-sm font-bold uppercase tracking-widest">
+                            <i className="fas fa-undo mr-2"></i> Replay Narrative
+                        </button>
+
+                        <button 
+                            onClick={() => window.location.href = 'index.html?step=4'}
+                            className="px-8 py-3 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition-all text-sm font-bold uppercase tracking-widest shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+                        >
+                            Next Chapter <i className="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         );
@@ -2396,5 +2409,6 @@
         const root3 = ReactDOM.createRoot(document.getElementById('root-part3'));
         root3.render(<AppPart3 />);
     </script>
+    <script src="global-nav.js"></script>
 </body>
 </html>
