@@ -146,17 +146,3 @@ The visualizations are powered by real-world data reflecting the cross-border dy
 *   **Processed Files:**
     *   `dataset/HONG_KONG_Statistics_on_Daily_Passenger_Traffic@3.csv`
     *   `dataset/Deficit.csv`
-
----
-
-## 📝 Credits & License
-
-*   **Project Creator:** [Leonardolee351-LMX](https://github.com/Leonardolee351-LMX)
-*   **Images:** 
-    *   Photography provided by Unsplash (License: Unsplash License).
-    *   Historical/News images cited from public news sources where applicable.
-*   **UI Components:**
-    *   Select components adapted from [shadcn/ui](https://ui.shadcn.com/) (MIT License).
-*   **License:** 
-    *   Project content and code: All Rights Reserved (unless otherwise specified in the repo).
-    *   Open source libraries are used under their respective licenses (MIT, etc.).
